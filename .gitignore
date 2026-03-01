@@ -1,16 +1,22 @@
 # macOS
 .DS_Store
 
-# Xcode / SwiftPM
-DerivedData/
-.build/
-xcuserdata/
-*.moved-aside
-*.xccheckout
-
-# Node / Capacitor
+# Node
 node_modules/
-dist/
 
-# CocoaPods (if used)
-Pods/
+# Web build output
+dist/
+build/
+
+# Local build artifacts
+build_local.log
+build_local.xcarchive/
+
+# Xcode
+**/DerivedData/
+**/build/
+**/*.xcuserstate
+**/xcuserdata/
+
+# Capacitor iOS build output
+FU-BookKeeping-ios/Products/

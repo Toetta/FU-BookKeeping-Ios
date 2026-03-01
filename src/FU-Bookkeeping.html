@@ -29,15 +29,16 @@
   </script>
   <style>
     html{ font-size: clamp(14px, 1.05vw, 16px); }
-    :root{ --bg:#0b0f14; --card:#111826; --muted:#94a3b8; --text:#e5e7eb; --line:#223044; --ok:#22c55e; --bad:#ef4444; --accent:#60a5fa; }
+    :root{ --bg:#191717; --bg2:#141212; --bg-rgb:25,23,23; --card:#211F1F; --card-rgb:33,31,31; --card2:#282626; --card2-rgb:40,38,38; --muted:#94a3b8; --text:#e5e7eb; --line:#223044; --ok:#22c55e; --bad:#ef4444; --accent:#60a5fa; }
     *{ box-sizing:border-box; }
     *[hidden]{ display:none !important; }
-    body{ margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; background:linear-gradient(180deg,#0b0f14,#070a0f); color:var(--text); }
+    body{ margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; background:linear-gradient(180deg,var(--bg),var(--bg2)); color:var(--text); }
     /* Header/nav: force-disable any lingering backdrop-filter (it can break clicks in some setups) */
     header{
-      position:relative;
-      z-index:5;
-      background:rgba(11,15,20,.98);
+      position:sticky;
+      top:0;
+      z-index:100;
+      background:rgba(var(--bg-rgb),.98);
       border-bottom:1px solid var(--line);
       backdrop-filter:none !important;
       -webkit-backdrop-filter:none !important;
@@ -59,7 +60,7 @@
       padding:12px;
       border:1px solid var(--line);
       border-radius:16px;
-      background:rgba(17,24,38,.90);
+      background:rgba(var(--card-rgb),.90);
       box-shadow: 0 10px 30px rgba(0,0,0,.18);
       position:relative;
       z-index:20;
@@ -81,7 +82,26 @@
       border-radius:12px;
       cursor:pointer;
     }
+    .navActionBtn{
+      width:100%;
+      text-align:left;
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap:10px;
+      background:transparent;
+      color:var(--muted);
+      border:1px solid var(--line);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+    }
     .navGroupBtn:focus{
+      outline:none;
+      border-color:rgba(96,165,250,.7);
+      box-shadow:0 0 0 3px rgba(96,165,250,.12);
+    }
+    .navActionBtn:focus{
       outline:none;
       border-color:rgba(96,165,250,.7);
       box-shadow:0 0 0 3px rgba(96,165,250,.12);
@@ -106,7 +126,7 @@
       padding:10px;
       border:1px solid var(--line);
       border-radius:16px;
-      background:rgba(17,24,38,.96);
+      background:rgba(var(--card2-rgb),.96);
       box-shadow: 0 18px 45px rgba(0,0,0,.35);
       z-index:60;
     }
@@ -130,10 +150,25 @@
       }
     }
     .row{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-    .header-row{ align-items:flex-end; }
-    .header-row .pill{ align-self:flex-end; }
-    .header-row .field{ align-self:flex-end; }
+    .header-row{ align-items:center; }
     h1{ margin:0; font-size:18px; font-weight:700; }
+
+    .brand{ display:flex; align-items:center; gap:10px; flex:0 0 auto; position:relative; }
+    .brandLogo{ display:block; height:115px; width:auto; max-width:864px; object-fit:contain; }
+    @media (max-width: 420px){
+      .brandLogo{ height:86px; max-width:624px; }
+    }
+    .sr-only{
+      position:absolute;
+      width:1px;
+      height:1px;
+      padding:0;
+      margin:-1px;
+      overflow:hidden;
+      clip:rect(0,0,0,0);
+      white-space:nowrap;
+      border:0;
+    }
     .pill{ font-size:12px; color:var(--muted); border:1px solid var(--line); padding:6px 10px; border-radius:999px; }
     .pill.ok{ border:3px solid rgba(34,197,94,.7); background:rgba(34,197,94,.08); color:var(--text); }
     .pill.bad{ border:3px solid rgba(239,68,68,.7); background:rgba(239,68,68,.08); color:var(--text); }
@@ -142,7 +177,7 @@
       appearance:none;
       -webkit-appearance:none;
       -moz-appearance:none;
-      background:rgba(17,24,38,.85);
+      background:rgba(var(--card-rgb),.85);
       color:var(--text);
       cursor:pointer;
       border:1px solid rgba(96,165,250,.45);
@@ -171,7 +206,7 @@
     main .wrap{ padding-top:18px; }
     .grid{ display:grid; grid-template-columns: 1fr; gap:12px; min-width:0; }
     @media (min-width: 980px){ .grid.two{ grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); } }
-    .card{ isolation:isolate; overflow:hidden; background:rgba(17,24,38,.94); border:1px solid var(--line); border-radius:16px; padding:14px; box-shadow: 0 10px 30px rgba(0,0,0,.25);  min-width:0; overflow:hidden; }
+    .card{ isolation:isolate; overflow:hidden; background:rgba(var(--card-rgb),.94); border:1px solid var(--line); border-radius:16px; padding:14px; box-shadow: 0 10px 30px rgba(0,0,0,.25);  min-width:0; overflow:hidden; }
     .card h2{ margin:0 0 10px 0; font-size:14px; color:var(--muted); font-weight:700; letter-spacing:.02em; }
     .muted{ color:var(--muted); }
     .btn{ background:rgba(96,165,250,.15); border:1px solid rgba(96,165,250,.4); color:var(--text); padding:8px 12px; border-radius:12px; cursor:pointer; }
@@ -182,6 +217,31 @@
     .field label{ font-size:12px; color:var(--muted); }
     input, select, textarea{ background:#0b1220; color:var(--text); border:1px solid var(--line); border-radius:12px; padding:10px 10px; outline:none; }
     input:focus, select:focus, textarea:focus{ border-color:rgba(96,165,250,.7); box-shadow:0 0 0 3px rgba(96,165,250,.12); }
+
+    /* Chrome/Edge autofill can force a white background on inputs (notably passwords).
+       Override it to match the app theme. */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    textarea:-webkit-autofill,
+    textarea:-webkit-autofill:hover,
+    textarea:-webkit-autofill:focus,
+    select:-webkit-autofill,
+    select:-webkit-autofill:hover,
+    select:-webkit-autofill:focus{
+      -webkit-text-fill-color: var(--text);
+      caret-color: var(--text);
+      -webkit-box-shadow: 0 0 0px 1000px #0b1220 inset;
+      box-shadow: 0 0 0px 1000px #0b1220 inset;
+      border:1px solid var(--line);
+      transition: background-color 9999s ease-in-out 0s;
+    }
+    input:autofill,
+    textarea:autofill,
+    select:autofill{
+      background:#0b1220 !important;
+      color:var(--text) !important;
+    }
     textarea{ min-height: 84px; resize: vertical; }
     table{ width:100%; border-collapse: collapse; }
     th, td{ border-bottom:1px solid rgba(34,48,68,.8); padding:8px 8px; text-align:left; vertical-align:top; }
@@ -210,6 +270,19 @@
     .status{ font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid var(--line); }
     .status.ok{ color:var(--ok); border-color:rgba(34,197,94,.35); background:rgba(34,197,94,.08); }
     .status.bad{ color:var(--bad); border-color:rgba(239,68,68,.35); background:rgba(239,68,68,.08); }
+
+    /* Global banner: used to make required setup (arbetsfil) very obvious */
+    .workfileBanner{
+      border:2px solid rgba(239,68,68,.35);
+      background:rgba(239,68,68,.10);
+      border-radius:16px;
+      padding:12px 14px;
+      margin-bottom:12px;
+    }
+    .workfileBanner .wfRow{ display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .workfileBanner .wfTitle{ font-weight:900; letter-spacing:.01em; }
+    .workfileBanner .wfBody{ font-size:13px; color:var(--text); }
+    .workfileBanner .wfActions{ display:flex; gap:10px; flex-wrap:wrap; }
     .list{ display:grid; gap:12px; }
     .item{ position:relative; overflow:hidden; padding:10px; border:1px solid var(--line); border-radius:14px; background:rgba(11,18,32,.92); }
     .item.voided{ opacity:.72; border-style:dashed; }
@@ -235,7 +308,7 @@
       transform:translateX(-50%);
       z-index:9999;
       max-width:min(520px, calc(100vw - 24px));
-      background:rgba(17,24,38,.98);
+      background:rgba(var(--card2-rgb),.98);
       color:var(--text);
       border:1px solid var(--line);
       border-radius:14px;
@@ -258,7 +331,7 @@
     }
     .modal{
       width:min(520px, calc(100vw - 24px));
-      background:rgba(17,24,38,.98);
+      background:rgba(var(--card2-rgb),.98);
       border:1px solid var(--line);
       border-radius:16px;
       padding:14px;
@@ -271,6 +344,33 @@
     }
     .modal .actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:12px; flex-wrap:wrap; }
 
+    /* Splash screen (shown before app starts on custom domains) */
+    body.splashActive header,
+    body.splashActive main{ display:none; }
+    .splashBackdrop{
+      position:fixed;
+      inset:0;
+      z-index:10000;
+      background:linear-gradient(180deg,var(--bg),var(--bg2));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+    }
+    .splashCard{
+      width:min(720px, calc(100vw - 24px));
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:rgba(var(--card-rgb),.94);
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      padding:16px;
+    }
+    .splashTop{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+    .splashLogo{ height:72px; width:auto; object-fit:contain; }
+    .splashTitle{ font-size:16px; font-weight:800; margin:0; }
+    .splashText{ margin:10px 0 0 0; color:var(--muted); font-size:13px; line-height:1.45; }
+    .splashActions{ display:flex; justify-content:flex-end; gap:10px; margin-top:14px; flex-wrap:wrap; }
+
   </style>
 
   <!-- OCR (offline i webbläsaren: körs lokalt, inga filer laddas upp) -->
@@ -278,11 +378,90 @@
   <script defer src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.0.379/legacy/build/pdf.min.js"></script>
 
 </head>
-<body>
+<body class="splashActive">
+
+<div id="splash" class="splashBackdrop" role="dialog" aria-modal="true" aria-label="Starta FU-Bookkeeping">
+  <div class="splashCard">
+    <div class="splashTop">
+      <div class="row" style="gap:10px; align-items:center; margin:0;">
+        <img class="splashLogo" src="FU-BookKeeping.png" alt="FU-BOOKKEEPING" decoding="async" />
+        <div style="display:grid; gap:2px;">
+          <h2 class="splashTitle">FU-Bookkeeping</h2>
+          <div class="muted small">Bokföring offline i webbläsaren</div>
+        </div>
+      </div>
+      <span class="pill">v0.2.32</span>
+    </div>
+    <p class="splashText">Klicka <b>Starta</b> för att öppna bokföringsprogrammet. All data lagras lokalt i din webbläsare.</p>
+    <div class="splashActions">
+      <button type="button" class="btn" id="btnSplashStart">Starta</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Splash screen: show on any non-local hostname (works on both custom domains and github.io).
+  // Bypass on file:// and localhost, and allow ?nosplash=1 for quick bypass.
+  (function(){
+    var splash = document.getElementById("splash");
+    var btnSplashStart = document.getElementById("btnSplashStart");
+
+    function closeSplash(){
+      try { document.body.classList.remove("splashActive"); } catch {}
+      try { if (splash) splash.setAttribute("hidden", ""); } catch {}
+      try {
+        var firstNavBtn = document.querySelector(".sidebar .navGroupBtn") || document.querySelector(".sidebar button");
+        if (firstNavBtn && firstNavBtn.focus) firstNavBtn.focus();
+      } catch {}
+    }
+
+    // Expose for debugging / manual bypass
+    try { window.__fuCloseSplash = closeSplash; } catch {}
+
+    try {
+      var h = String(location.hostname || "").toLowerCase();
+      var isLocal = (!h || h === "localhost" || h === "127.0.0.1");
+      var isFile = (String(location.protocol || "").toLowerCase() === "file:");
+      var nosplash = false;
+      try {
+        var sp = new URLSearchParams(String(location.search || ""));
+        nosplash = sp.has("nosplash") && sp.get("nosplash") !== "0";
+      } catch (e2) {}
+
+      var show = !(isLocal || isFile || nosplash);
+      if (!show){
+        closeSplash();
+        return;
+      }
+    } catch (e) {}
+
+    if (btnSplashStart){
+      btnSplashStart.addEventListener("click", function(e){
+        try { if (e && e.preventDefault) e.preventDefault(); } catch {}
+        closeSplash();
+      });
+    }
+
+    document.addEventListener("keydown", function(e){
+      try {
+        if (!document.body.classList.contains("splashActive")) return;
+        var k = (e && e.key) ? String(e.key) : "";
+        if (k === "Enter" || k === "Escape"){
+          try { e.preventDefault(); } catch {}
+          closeSplash();
+        }
+      } catch (e3) {}
+    });
+  })();
+</script>
+
 <header>
   <div class="wrap">
     <div class="row header-row">
-      <h1 id="companyName">FU-BOOKKEEPING</h1>
+      <h1 class="brand" aria-label="FU-BOOKKEEPING">
+        <img class="brandLogo" src="FU-BookKeeping.png" alt="FU-BOOKKEEPING" decoding="async" />
+        <span id="companyName" class="sr-only">FU-BOOKKEEPING</span>
+      </h1>
       <div class="field" style="gap:4px; min-width: 180px;">
         <select class="pill" id="companySelect" aria-label="Företag"></select>
 <select class="pill" id="yearPillSelect" aria-label="Räkenskapsår"></select>
@@ -290,7 +469,7 @@
       <span class="pill" id="bootPill">JS: laddar…</span>
       <span class="pill" id="storagePill">Lagring: localStorage (offline)</span>
       <span class="pill" id="backupPill">Backup: –</span>
-      <span class="pill" id="revPill">v0.2.19</span>
+      <span class="pill" id="revPill">v0.2.32</span>
     </div>
   </div>
 </header>
@@ -358,8 +537,25 @@
             <button type="button" class="tab" data-tab="settings">Inställningar</button>
           </div>
         </div>
+
+        <div class="navGroup" data-group="webshop-import">
+          <button type="button" class="navActionBtn" id="btnWsQuickImport">Webshop Import</button>
+        </div>
       </aside>
       <div class="content">
+
+        <div id="workfileBanner" class="workfileBanner" role="status" aria-live="polite" hidden>
+          <div class="wfRow">
+            <div style="min-width:260px; flex:1;">
+              <div class="wfTitle">Programmet är låst: ingen arbetsfil ansluten</div>
+              <div class="wfBody" id="workfileBannerBody" style="margin-top:4px;"></div>
+            </div>
+            <div class="wfActions">
+              <a id="workfileHttpsLink" class="btn secondary" href="#" hidden>Byt till HTTPS</a>
+              <button type="button" class="btn" id="btnWorkfileFix">Visa arbetsfil-inställningar</button>
+            </div>
+          </div>
+        </div>
 
     <!-- VERIFIKATIONER -->
     <section id="tab-vouchers">
@@ -1372,6 +1568,92 @@
                 <span class="muted small">Visas alltid i menyn, men är låst om du inte aktiverar här.</span>
               </div>
 
+              <div style="height:1px; background:rgba(34,48,68,.8); margin:12px 0;"></div>
+              <h2>Webshop-synk (tillägg)</h2>
+              <div class="muted small" style="margin-bottom:10px;">
+                Importera verifikationer som ligger i kö på din webshop via <b>/api/fu/pull</b> och kvittera med <b>/api/fu/ack</b>.
+              </div>
+              <div class="row" style="gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:10px;">
+                <label class="muted small" style="display:flex; align-items:center; gap:8px;">
+                  <input id="wsEnabled" type="checkbox" />
+                  Aktivera webshop-synk för detta företag
+                </label>
+              </div>
+              <div class="row" style="gap:10px; align-items:end; flex-wrap:wrap; margin-bottom:10px;">
+                <div class="field" style="min-width:260px; flex:1;">
+                  <label>Serveradress</label>
+                  <input id="wsApiBaseUrl" placeholder="https://api.innovatio-brutalis.se" />
+                  <div class="muted small" style="margin-top:6px;">Lämna standard om du använder Innovatio.</div>
+                </div>
+                <div class="field" style="min-width:240px; flex:1;">
+                  <label style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                    <span>X-FU-Key</span>
+                    <button class="btn secondary" type="button" id="btnWsKeyHelp" aria-expanded="false" aria-controls="wsKeyHelp" style="padding:6px 10px; border-radius:999px;">Hjälp</button>
+                  </label>
+                  <input id="wsApiKey" type="password" placeholder="hemlig nyckel" autocomplete="current-password" inputmode="text" />
+                  <div class="row" style="justify-content:flex-end; margin-top:8px;">
+                    <button class="btn secondary" type="button" id="btnWsSaveKeyMgr" title="Sparar nyckeln i webbläsarens lösenordshanterare (Chrome/Edge, HTTPS)">Spara i lösenordshanteraren</button>
+                  </div>
+                  <div id="wsCredIdPreview" class="muted small" style="margin-top:6px; text-align:right;"></div>
+                </div>
+              </div>
+              <div id="wsKeyHelp" class="muted small" hidden style="margin-top:-6px; margin-bottom:10px;">
+                <div style="font-weight:800; margin-bottom:6px;">Hjälp: X-FU-Key</div>
+                <div style="display:grid; gap:10px;">
+                  <div><b>X-FU-Key</b> är en <b>hemlig nyckel</b> (som ett lösenord) som ger rätt att importera från en webshop-kö. Den skapas och hanteras av den som driftar webshop-synken – den går inte att “hämta från FU”.</div>
+
+                  <div style="font-weight:800;">Hur får jag min X-FU-Key? (slutanvändare)</div>
+                  <ol style="margin:0; padding-left:18px; display:grid; gap:6px;">
+                    <li>Be den som driftar webshop-synken (admin/IT) om en <b>X-FU-Key</b> för <b>detta företag</b>.</li>
+                    <li>Be även om rätt <b>Serveradress</b> (URL). Om ni kör Innovatio är den ofta <span class="kbd">https://api.innovatio-brutalis.se</span>.</li>
+                    <li>Klistra in nyckeln här och klicka <b>Spara</b>.</li>
+                    <li>Klicka <b>Import</b>.</li>
+                  </ol>
+
+                  <div style="font-weight:800;">Mall att skicka till admin</div>
+                  <div class="kbd" style="white-space:pre-wrap;">Hej! Jag ska aktivera Webshop-synk i FU-Bookkeeping.
+
+Jag behöver:
+1) Serveradress (URL) till backend (t.ex. https://innovatio-brutalis.com)
+2) En X-FU-Key för företaget: <FÖRETAGSNAMN / ORGNR>
+
+Nyckeln ska fungera mot /api/fu/pull och /api/fu/ack.
+Tack!</div>
+
+                  <div>Tips: Om du får <span class="kbd">401/403</span> i status är nyckeln fel/inte behörig. Om du får nätverksfel är oftast URL:en fel eller backend nere.</div>
+
+                  <div style="font-weight:800; margin-top:2px;">Om du är admin: så skapar/roterar du nyckeln (Cloudflare)</div>
+                  <ol style="margin:0; padding-left:18px; display:grid; gap:6px;">
+                    <li>Logga in på <span class="kbd">https://dash.cloudflare.com</span></li>
+                    <li>Gå till <b>Pages</b> → välj ert projekt för backend (t.ex. innovatio-brutalis)</li>
+                    <li>Gå till <b>Settings</b> → <b>Variables &amp; Secrets</b></li>
+                    <li>Lägg till eller uppdatera en <b>Secret</b> för FU-nyckeln enligt projektets namnstandard (exakt variabelnamn kan skilja). Värdet ska vara en lång slumpad sträng.</li>
+                    <li>Viktigt: Secrets går normalt <b>inte att läsa ut</b> i klartext i efterhand. Om du inte har värdet: skapa en <b>ny</b> nyckel (rota) och dela den till användaren.</li>
+                    <li>Testa att användaren kan importera; vid <span class="kbd">401/403</span> är nyckeln fel/inte inlagd.</li>
+                  </ol>
+
+                  <div style="font-weight:800; margin-top:2px;">För den som driftar backend (krav, kort)</div>
+                  <ol style="margin:0; padding-left:18px; display:grid; gap:6px;">
+                    <li>Det måste finnas en backend på er domän som erbjuder <span class="kbd">/api/fu/pull</span> och <span class="kbd">/api/fu/ack</span>.</li>
+                    <li>Backenden måste kräva headern <span class="kbd">X-FU-Key</span> och validera den.</li>
+                    <li>Dela ut nyckeln till användaren (som ett lösenord). Rotera vid behov.</li>
+                  </ol>
+                </div>
+              </div>
+              <div class="row" style="gap:10px; align-items:end; flex-wrap:wrap;">
+                <div class="field" style="min-width:200px;">
+                  <label>Verifikationsserie</label>
+                  <input id="wsSeries" placeholder="W" />
+                </div>
+                <div class="field" style="min-width:200px;">
+                  <label>Max per import</label>
+                  <input id="wsLimit" inputmode="numeric" placeholder="1" />
+                </div>
+                <button class="btn secondary" type="button" id="btnWsTest">Testa</button>
+                <button class="btn secondary" type="button" id="btnWsImport">Import</button>
+              </div>
+              <div id="wsStatus" class="muted small" style="margin-top:8px;"></div>
+
             <div class="row" style="justify-content:flex-end;">
               <button class="btn" id="btnSaveSettings">Spara</button>
             </div>
@@ -1436,7 +1718,7 @@
           </div>
         </div>
 
-        <div class="card">
+        <div class="card" id="workfileCard">
           <h2>Företag (JSON-datafil)</h2>
           <div class="row" style="gap:10px; flex-wrap:wrap;">
             <button class="btn" id="btnConnectFile">Koppla befintligt företag (JSON)</button>
@@ -1709,9 +1991,10 @@
  
 
   const APP_VERSION = "1.3.0"; // bump when adding new data fields
-  const APP_SEMVER = "0.2.19";  // user-facing revision
-  const APP_GIT_REV = "86fcf6d";      // injected by tools/stamp-fu-version.mjs (optional)
-  const STORAGE_KEY = "FU_BOOKKEEPING_STATE";
+  const APP_SEMVER = "0.2.30";  // user-facing revision
+  const APP_GIT_REV = "";      // injected by tools/stamp-fu-version.mjs (optional)
+  const STORAGE_KEY = "FU_BOOKKEEPING_STATE"; // legacy single-company key (kept for migration)
+  const STORAGE_KEY_PREFIX = "FU_BOOKKEEPING_STATE_V2:"; // per-company state key prefix
 
   let localStorageOk = true;
 
@@ -1927,6 +2210,51 @@
   const todayISO = () => new Date().toISOString().slice(0,10);
   const clampText = (s, max=120) => String(s ?? "").slice(0,max);
 
+  // --- Polyfills ---
+  // crypto.randomUUID() is only available in secure contexts (HTTPS) in many browsers.
+  // When running on http:// (e.g. before TLS is fully provisioned) we polyfill it.
+  (function ensureRandomUUID(){
+    try {
+      const c = (typeof window !== "undefined" && window.crypto) ? window.crypto : null;
+      if (!c || typeof c.randomUUID === "function") return;
+
+      function bytesToUuidV4(bytes){
+        const hex = Array.from(bytes, (b)=> b.toString(16).padStart(2, "0")).join("");
+        return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20,32)}`;
+      }
+
+      function weakUuidV4(){
+        function randomHex(len){
+          let out = "";
+          while (out.length < len){
+            out += Math.floor(Math.random() * 0x100000000).toString(16).padStart(8, "0");
+          }
+          return out.slice(0, len);
+        }
+        const p1 = randomHex(8);
+        const p2 = randomHex(4);
+        const p3 = "4" + randomHex(3);
+        const p4 = (8 + Math.floor(Math.random() * 4)).toString(16) + randomHex(3);
+        const p5 = randomHex(12);
+        return `${p1}-${p2}-${p3}-${p4}-${p5}`;
+      }
+
+      c.randomUUID = function(){
+        try {
+          if (typeof c.getRandomValues === "function"){
+            const bytes = new Uint8Array(16);
+            c.getRandomValues(bytes);
+            // RFC 4122 v4
+            bytes[6] = (bytes[6] & 0x0f) | 0x40;
+            bytes[8] = (bytes[8] & 0x3f) | 0x80;
+            return bytesToUuidV4(bytes);
+          }
+        } catch (e) {}
+        return weakUuidV4();
+      };
+    } catch (e) {}
+  })();
+
   function escapeHtml(s){
     return String(s ?? "")
       .replaceAll("&", "&amp;")
@@ -2006,7 +2334,7 @@
 
     if (!o.fileSync) o.fileSync = { autosave: true, requireFile: false };
     if (typeof o.fileSync.autosave !== "boolean") o.fileSync.autosave = true;
-    if (typeof o.fileSync.requireFile !== "boolean") o.fileSync.requireFile = false;
+    if (typeof o.fileSync.requireFile !== "boolean") o.fileSync.requireFile = true;
 
     if (!Array.isArray(o.fiscalYears)) o.fiscalYears = base.fiscalYears;
     if (!o.activeYearId) o.activeYearId = o.fiscalYears[0]?.id ?? String(new Date().getFullYear());
@@ -2385,7 +2713,27 @@ function updateBackupUI(){
 
   async function wipeAllData(){
     if (!(await confirmAsync("Rensa ALL data? Detta kan inte ångras. Ta en backup först."))) return;
-    try { localStorage.removeItem(STORAGE_KEY); } catch (e){ console.error(e); }
+    try {
+      // Legacy single-company key
+      try { localStorage.removeItem(STORAGE_KEY); } catch {}
+      // Per-company keys
+      try {
+        const ks = [];
+        for (let i = 0; i < localStorage.length; i++){
+          const k = localStorage.key(i);
+          if (!k) continue;
+          if (String(k).startsWith(STORAGE_KEY_PREFIX)) ks.push(k);
+          if (String(k).startsWith("FU_WS_IMPORTED_PAYLOADS_V1:")) ks.push(k);
+        }
+        ks.forEach(k=>{ try { localStorage.removeItem(k); } catch {} });
+      } catch {}
+
+      // Registry + migration flags
+      try { localStorage.removeItem(COMPANY_REGISTRY_KEY); } catch {}
+      try { localStorage.removeItem(COMPANY_REGISTRY_MIGRATED_FLAG); } catch {}
+    } catch (e){
+      console.error(e);
+    }
     try { await fsDisconnect(); } catch (e){ /* ignore */ }
     state = defaultData();
     try { fillYearSelectors(); } catch (e){ console.error(e); }
@@ -3493,9 +3841,9 @@ cur = {
     const now = new Date();
     const y = now.getFullYear();
     return {
-      company: { name: "FU-BOOKKEEPING", orgnr: "", currency: "SEK", defaultSign: "", addr:"", zip:"", city:"", country:"", email:"", phone:"", web:"", vat:"", payDays:30, bankgiro:"", plusgiro:"", swishPhone:"", bankAccountNo:"", iban:"", swift:"", invoiceNote:"", invoiceFooter:"", logoDataUrl:"" },
+      company: { name: "FU-BOOKKEEPING", orgnr: "", currency: "SEK", defaultSign: "", addr:"", zip:"", city:"", country:"", email:"", phone:"", web:"", vat:"", payDays:30, bankgiro:"", plusgiro:"", swishPhone:"", bankAccountNo:"", iban:"", swift:"", invoiceNote:"", invoiceFooter:"", logoDataUrl:"", webshopSync: { enabled: false, apiBaseUrl: "https://api.innovatio-brutalis.se", apiKey: "", series: "W", pullLimit: 1 } },
       features: { sruEnabled: false },
-      fileSync: { autosave: true, requireFile: false },
+      fileSync: { autosave: true, requireFile: true },
       fiscalYears: [
         { id: String(y-1), start: `${y-1}-01-01`, end: `${y-1}-12-31` },
         { id: String(y),   start: `${y}-01-01`,   end: `${y}-12-31` },
@@ -3540,10 +3888,104 @@ cur = {
       
   }
 
+  function getActiveCompanyIdForStorage(){
+    try {
+      if (typeof CompanyManager !== "undefined" && CompanyManager && typeof CompanyManager.getActiveCompanyId === "function"){
+        return CompanyManager.getActiveCompanyId();
+      }
+    } catch {}
+    try {
+      const r = companyLoadRegistry();
+      return (r && r.activeCompanyId) ? String(r.activeCompanyId) : null;
+    } catch {}
+    return null;
+  }
+
+  function storageKeyForCompany(companyId){
+    const id = String(companyId || "").trim();
+    return id ? (STORAGE_KEY_PREFIX + id) : STORAGE_KEY;
+  }
+
+  function storageKeyForActiveCompany(){
+    return storageKeyForCompany(getActiveCompanyIdForStorage());
+  }
+
+  function ensureLocalCompanyRegistry(nameHint, orgnrHint){
+    // Ensures there is at least one company in the registry so the dropdown isn't empty
+    // when using localStorage-only mode.
+    let r = null;
+    try { r = companyLoadRegistry(); } catch {}
+    if (!r) r = companyEmptyRegistry();
+    if (!r.companies || typeof r.companies !== "object") r.companies = {};
+
+    // Keep an existing valid active company
+    if (r.activeCompanyId && r.companies[r.activeCompanyId]) return String(r.activeCompanyId);
+
+    // If there are companies but none active, pick the first
+    const ids = Object.keys(r.companies || {});
+    if (ids.length){
+      r.activeCompanyId = ids[0];
+      try { companySaveRegistry(r); } catch {}
+      return String(r.activeCompanyId);
+    }
+
+    // Create a single local company entry
+    const id = "c_local";
+    r.companies[id] = {
+      id,
+      name: String(nameHint || "").trim() || "Företag 1",
+      orgnr: String(orgnrHint || "").trim(),
+      createdAtISO: nowISO(),
+      lastOpenedISO: nowISO(),
+      lastBackupDate: null,
+      colorTag: null,
+    };
+    r.activeCompanyId = id;
+    try { companySaveRegistry(r); } catch {}
+    return id;
+  }
+
   function load(){
     let raw = "";
     try {
-      raw = localStorage.getItem(STORAGE_KEY) || "";
+      // Determine which company we should load for.
+      let activeId = getActiveCompanyIdForStorage();
+
+      // If there is no company yet, create a local one so the app is usable without a JSON file.
+      if (!activeId){
+        // If legacy state exists, try to pull name/orgnr from it.
+        try {
+          const legacyRaw = localStorage.getItem(STORAGE_KEY) || "";
+          if (legacyRaw){
+            try {
+              const legacyObj = JSON.parse(legacyRaw);
+              const n = legacyObj && legacyObj.company && legacyObj.company.name ? String(legacyObj.company.name).trim() : "";
+              const o = legacyObj && legacyObj.company && legacyObj.company.orgnr ? String(legacyObj.company.orgnr).trim() : "";
+              activeId = ensureLocalCompanyRegistry(n, o);
+            } catch {
+              activeId = ensureLocalCompanyRegistry("", "");
+            }
+          } else {
+            activeId = ensureLocalCompanyRegistry("", "");
+          }
+        } catch {
+          activeId = ensureLocalCompanyRegistry("", "");
+        }
+      }
+
+      const key = storageKeyForCompany(activeId);
+      raw = localStorage.getItem(key) || "";
+
+      // One-time migration: if per-company key is missing but legacy key exists, copy it.
+      if (!raw){
+        const legacyRaw = localStorage.getItem(STORAGE_KEY) || "";
+        if (legacyRaw && key !== STORAGE_KEY){
+          try { localStorage.setItem(key, legacyRaw); } catch {}
+          raw = legacyRaw;
+        } else {
+          raw = legacyRaw;
+        }
+      }
       localStorageOk = true;
     } catch (e){
       console.error(e);
@@ -3561,8 +4003,8 @@ cur = {
       for (const k of Object.keys(cdef)) if (d.company[k] == null) d.company[k] = cdef[k];
 if (!d.features) d.features = { sruEnabled: false };
       if (typeof d.features.sruEnabled !== "boolean") d.features.sruEnabled = false;
-      if (!d.fileSync) d.fileSync = { autosave: true, requireFile: false };
-      if (typeof d.fileSync.requireFile !== "boolean") d.fileSync.requireFile = false;
+      if (!d.fileSync) d.fileSync = { autosave: true, requireFile: true };
+      if (typeof d.fileSync.requireFile !== "boolean") d.fileSync.requireFile = true;
       if (!d.fiscalYears) d.fiscalYears = defaultData().fiscalYears;
       if (!d.accounts) d.accounts = demoAccounts();
       if (!d.vouchers) d.vouchers = [];
@@ -3609,7 +4051,7 @@ if (!d.features) d.features = { sruEnabled: false };
 
     let persisted = false;
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      localStorage.setItem(storageKeyForActiveCompany(), JSON.stringify(state));
       persisted = true;
     } catch (e){
       console.error(e);
@@ -3621,7 +4063,7 @@ if (!d.features) d.features = { sruEnabled: false };
         const prev = state.company.logoDataUrl;
         try {
           state.company.logoDataUrl = "";
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          localStorage.setItem(storageKeyForActiveCompany(), JSON.stringify(state));
           persisted = true;
           showToast("Kunde inte spara p.g.a. lagringsutrymme. Logotypen var troligen för stor och togs bort – försök med en mindre bild.", 8000);
         } catch (e2){
@@ -3630,7 +4072,7 @@ if (!d.features) d.features = { sruEnabled: false };
           // Try one more pass by pruning large optional fields (e.g. bankimport raw rows)
           try {
             if (pruneForStorage()){
-              localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+              localStorage.setItem(storageKeyForActiveCompany(), JSON.stringify(state));
               persisted = true;
               showToast("Kunde inte spara p.g.a. lagringsutrymme. Rensade rådata från importerade bankrader för att få plats.", 9000);
             } else {
@@ -3646,7 +4088,7 @@ if (!d.features) d.features = { sruEnabled: false };
         if (isQuotaError(e)){
           try {
             if (pruneForStorage()){
-              localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+              localStorage.setItem(storageKeyForActiveCompany(), JSON.stringify(state));
               persisted = true;
               showToast("Kunde inte spara p.g.a. lagringsutrymme. Rensade rådata från importerade bankrader för att få plats.", 9000);
             } else {
@@ -3675,7 +4117,7 @@ if (!d.features) d.features = { sruEnabled: false };
   // När användaren väljer en NY datafil ska inget gammalt ligga kvar lokalt och riskera att blandas ihop.
   // Detta körs automatiskt innan filen laddas/ansluts.
   async function wipeLocalDataForNewDataFile(){
-    try { localStorage.removeItem(STORAGE_KEY); } catch (e){ /* ignore */ }
+    try { localStorage.removeItem(storageKeyForActiveCompany()); } catch (e){ /* ignore */ }
     // Reset in-memory state (UI kommer ändå att uppdateras av fil-inläsningen)
     try { state = defaultData(); } catch (e){ /* ignore */ }
 
@@ -3749,7 +4191,9 @@ if (!d.features) d.features = { sruEnabled: false };
         storagePill.textContent = `Lagring: ${cn} · datafil (${name})`;
         setPillState(storagePill, fsLastError ? "bad" : "ok");
       } else {
-        storagePill.textContent = localStorageOk ? "Lagring: localStorage (offline)" : "Lagring: localStorage blockerad";
+        const cn = hasCompany ? (CompanyManager.activeCompanyDisplayName() || "Företag") : "";
+        const base = localStorageOk ? "localStorage (offline)" : "localStorage blockerad";
+        storagePill.textContent = cn ? `Lagring: ${cn} · ${base}` : `Lagring: ${base}`;
         // Offline storage is considered an error state in this app.
         setPillState(storagePill, "bad");
       }
@@ -3776,9 +4220,12 @@ if (!d.features) d.features = { sruEnabled: false };
 
     const requireFile = !!(state.fileSync && state.fileSync.requireFile);
 
+    // Global banner: make it very obvious when the app is locked without a work file.
+    try { updateWorkfileBanner({ requireFile, hasCompany, connected, supported: fsApiSupported() }); } catch (e){ /* ignore */ }
+
     if (!fsApiSupported()){
-      setFsStatus("bad", requireFile ? "Kräver HTTPS/localhost + Chrome/Edge (fil krävs)" : "Kräver HTTPS/localhost + Chrome/Edge");
-      setEditingLocked(true);
+      setFsStatus("bad", requireFile ? "Låst · fil krävs (HTTPS + Chrome/Edge)" : "Fil-synk stöds ej (localStorage används)" );
+      setEditingLocked(!!requireFile);
       return;
     }
 
@@ -3789,8 +4236,8 @@ if (!d.features) d.features = { sruEnabled: false };
     }
 
     if (!connected){
-      setFsStatus("bad", requireFile ? "Inte ansluten · kräver datafil" : "Inte ansluten");
-      setEditingLocked(true);
+      setFsStatus("bad", requireFile ? "Låst · fil krävs" : "Inte ansluten (localStorage används)");
+      setEditingLocked(!!requireFile);
       return;
     }
 
@@ -3804,6 +4251,61 @@ if (!d.features) d.features = { sruEnabled: false };
     }
 
     setEditingLocked(false);
+  }
+
+  function bestEffortHttpsUrl(){
+    try {
+      const proto = String(location.protocol || "").toLowerCase();
+      const host = String(location.host || "");
+      if (proto !== "http:" || !host) return null;
+      return `https://${host}${location.pathname || "/"}${location.search || ""}${location.hash || ""}`;
+    } catch {
+      return null;
+    }
+  }
+
+  function updateWorkfileBanner({ requireFile, hasCompany, connected, supported } = {}){
+    if (!workfileBanner || !workfileBannerBody) return;
+
+    const needsCompany = !hasCompany;
+    const needsFile = !!requireFile && !connected;
+    const shouldShow = needsCompany || needsFile;
+
+    if (!shouldShow){
+      workfileBanner.hidden = true;
+      return;
+    }
+
+    // Build message (very explicit, with the concrete fix)
+    const parts = [];
+    if (needsCompany){
+      parts.push("Välj eller skapa ett företag först. Detta görs via en JSON-datafil (arbetsfil).");
+    } else if (needsFile){
+      parts.push("Du har aktiverat \"Kräv datafil\" men ingen datafil är ansluten för valt företag.");
+    }
+
+    if (!supported){
+      parts.push("För att skapa/koppla arbetsfil krävs Chrome/Edge och secure context (HTTPS eller localhost).\nDu är inte i ett läge där filåtkomst stöds just nu.");
+    }
+
+    parts.push("Lösning: Gå till Administration → Inställningar → Företag (JSON-datafil) och klicka \"+ Skapa företag\" eller \"Koppla befintligt företag (JSON)\".");
+
+    const msg = parts.join(" ");
+    workfileBannerBody.textContent = msg;
+    workfileBanner.hidden = false;
+
+    // HTTPS helper link (only when we can construct a sensible upgrade URL)
+    try {
+      const httpsUrl = bestEffortHttpsUrl();
+      if (workfileHttpsLink){
+        if (httpsUrl){
+          workfileHttpsLink.href = httpsUrl;
+          workfileHttpsLink.hidden = false;
+        } else {
+          workfileHttpsLink.hidden = true;
+        }
+      }
+    } catch {}
   }
 
   async function fsEnsurePermission(request){
@@ -3856,8 +4358,9 @@ if (!d.features) d.features = { sruEnabled: false };
     { const cdef = defaultData().company; state.company = state.company || {}; for (const k of Object.keys(cdef)) if (state.company[k] == null) state.company[k] = cdef[k]; }
     if (!state.features) state.features = { sruEnabled: false };
     if (typeof state.features.sruEnabled !== "boolean") state.features.sruEnabled = false;
-    if (!state.fileSync) state.fileSync = { autosave: true, requireFile: false };
-    if (typeof state.fileSync.requireFile !== "boolean") state.fileSync.requireFile = false;
+    if (!state.fileSync) state.fileSync = { autosave: true, requireFile: true };
+    if (typeof state.fileSync.autosave !== "boolean") state.fileSync.autosave = true;
+    if (typeof state.fileSync.requireFile !== "boolean") state.fileSync.requireFile = true;
 
     // Auto-repair corrupted kontonamn via standardlista (utan SIE)
     try { if (typeof applyStdAccountsMapRepair === "function") applyStdAccountsMapRepair({ onlyReplacement: true }); } catch (e){ console.error(e); }
@@ -4157,6 +4660,12 @@ if (!d.features) d.features = { sruEnabled: false };
   const fsRequireFile = document.getElementById("fsRequireFile");
   const fsStatus = document.getElementById("fsStatus");
 
+  // Global banner (work file required)
+  const workfileBanner = document.getElementById("workfileBanner");
+  const workfileBannerBody = document.getElementById("workfileBannerBody");
+  const btnWorkfileFix = document.getElementById("btnWorkfileFix");
+  const workfileHttpsLink = document.getElementById("workfileHttpsLink");
+
   // Settings
   const sCompany = document.getElementById("sCompany");
   const sOrgnr = document.getElementById("sOrgnr");
@@ -4184,6 +4693,477 @@ if (!d.features) d.features = { sruEnabled: false };
   const sLogo = document.getElementById("sLogo");
   const btnRemoveLogo = document.getElementById("btnRemoveLogo");
   const logoPreview = document.getElementById("logoPreview");
+
+  // Webshop sync add-on (Settings)
+  const wsEnabled = document.getElementById("wsEnabled");
+  const wsApiBaseUrl = document.getElementById("wsApiBaseUrl");
+  const wsApiKey = document.getElementById("wsApiKey");
+  const btnWsSaveKeyMgr = document.getElementById("btnWsSaveKeyMgr");
+  const wsCredIdPreview = document.getElementById("wsCredIdPreview");
+  const btnWsKeyHelp = document.getElementById("btnWsKeyHelp");
+  const wsKeyHelp = document.getElementById("wsKeyHelp");
+  const wsSeries = document.getElementById("wsSeries");
+  const wsLimit = document.getElementById("wsLimit");
+  const btnWsTest = document.getElementById("btnWsTest");
+  const btnWsImport = document.getElementById("btnWsImport");
+  const btnWsQuickImport = document.getElementById("btnWsQuickImport");
+  const wsStatus = document.getElementById("wsStatus");
+
+  function webshopSyncDefaults(){
+    return { enabled: false, apiBaseUrl: "https://api.innovatio-brutalis.se", apiKey: "", series: "W", pullLimit: 1 };
+  }
+
+  function normalizeWebshopSync(cfg){
+    const d = webshopSyncDefaults();
+    const c = (cfg && typeof cfg === "object") ? cfg : {};
+    const pullLimitRaw = Number(c.pullLimit);
+    const pullLimit = Number.isFinite(pullLimitRaw) ? Math.min(50, Math.max(1, Math.round(pullLimitRaw))) : d.pullLimit;
+    return {
+      enabled: !!c.enabled,
+      apiBaseUrl: String(c.apiBaseUrl || d.apiBaseUrl || "").trim(),
+      apiKey: String(c.apiKey || "").trim(),
+      series: (String(c.series || d.series).trim() || d.series).slice(0, 3),
+      pullLimit,
+    };
+  }
+
+  function setWebshopStatus(text){
+    if (!wsStatus) return;
+    wsStatus.textContent = String(text || "");
+  }
+
+  function webshopImportedKey(companyId){
+    const id = String(companyId || "").trim();
+    return id ? `FU_WS_IMPORTED_PAYLOADS_V1:${id}` : "";
+  }
+
+  function loadWebshopImported(companyId){
+    const key = webshopImportedKey(companyId);
+    if (!key) return { ids: [], map: {} };
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return { ids: [], map: {} };
+      const obj = JSON.parse(raw);
+      const ids = Array.isArray(obj && obj.ids) ? obj.ids.map(x=>String(x||"").trim()).filter(Boolean) : [];
+      const map = (obj && obj.map && typeof obj.map === "object") ? obj.map : {};
+      const outMap = {};
+      for (const pid of ids){
+        const v = map && (pid in map) ? map[pid] : null;
+        outMap[pid] = v == null ? null : String(v);
+      }
+      return { ids, map: outMap };
+    } catch {
+      return { ids: [], map: {} };
+    }
+  }
+
+  function saveWebshopImported(companyId, data){
+    const key = webshopImportedKey(companyId);
+    if (!key) return false;
+    try {
+      const ids = Array.isArray(data && data.ids) ? data.ids.map(x=>String(x||"").trim()).filter(Boolean) : [];
+      const map = (data && data.map && typeof data.map === "object") ? data.map : {};
+      localStorage.setItem(key, JSON.stringify({ ids, map }));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function isWebshopPayloadImported(companyId, payloadId){
+    const pid = String(payloadId || "").trim();
+    if (!pid) return false;
+    const data = loadWebshopImported(companyId);
+    return !!(data.map && Object.prototype.hasOwnProperty.call(data.map, pid));
+  }
+
+  function getImportedVoucherId(companyId, payloadId){
+    const pid = String(payloadId || "").trim();
+    if (!pid) return null;
+    const data = loadWebshopImported(companyId);
+    const v = data.map && Object.prototype.hasOwnProperty.call(data.map, pid) ? data.map[pid] : null;
+    return v == null ? null : String(v);
+  }
+
+  function markWebshopPayloadImported(companyId, payloadId, voucherId){
+    const pid = String(payloadId || "").trim();
+    if (!pid) return false;
+
+    const data = loadWebshopImported(companyId);
+    data.map = data.map && typeof data.map === "object" ? data.map : {};
+    data.ids = Array.isArray(data.ids) ? data.ids : [];
+
+    if (!Object.prototype.hasOwnProperty.call(data.map, pid)) data.ids.push(pid);
+    data.map[pid] = voucherId == null ? null : String(voucherId);
+
+    const MAX = 800;
+    while (data.ids.length > MAX){
+      const drop = String(data.ids.shift() || "").trim();
+      if (drop) delete data.map[drop];
+    }
+    return saveWebshopImported(companyId, data);
+  }
+
+  function getYearIdForDate(dateIso){
+    const d = String(dateIso || "").slice(0,10);
+    const fys = Array.isArray(state.fiscalYears) ? state.fiscalYears : [];
+    const found = fys.find(fy => fy && fy.start && fy.end && fy.start <= d && d <= fy.end);
+    if (found && found.id) return String(found.id);
+    if (state && state.activeYearId) return String(state.activeYearId);
+    return d ? d.slice(0,4) : String(new Date().getFullYear());
+  }
+
+  function ensureVoucherSeries(series){
+    return (String(series || "W").trim() || "W");
+  }
+
+  function voucherFromWebshopPayload(payloadObj, { series } = {}){
+    const p = payloadObj && typeof payloadObj === "object" ? payloadObj : null;
+    if (!p) throw new Error("Saknar payload");
+    if (!Array.isArray(p.lines) || !p.lines.length) throw new Error("Payload saknar rader");
+
+    const date = String(p.date || todayISO()).slice(0,10);
+    const yearId = getYearIdForDate(date);
+    const seriesNorm = ensureVoucherSeries(series || "W");
+    const no = nextVerno(yearId, seriesNorm);
+
+    const text = clampText(String(p.lines[0]?.text || ((p.kind === "refund" ? "Refund" : "Order") + " " + (p.order_number || ""))).trim());
+    const sign = clampText((state.company.defaultSign || "").trim());
+    const regDate = todayISO();
+
+    const lines = p.lines.map((l) => {
+      const acc = String(l?.account ?? "").trim();
+      const debit = Number(l?.debit || 0);
+      const credit = Number(l?.credit || 0);
+      const amt = Math.round((debit - credit) * 100) / 100;
+      return { account: acc, text: clampText(String(l?.text || text)), amount: amt };
+    }).filter(l => l.account);
+
+    // Auto-add missing accounts referenced by the import.
+    // Keep this conservative: only add accounts that actually appear in the imported voucher lines.
+    try {
+      state.accounts = state.accounts || {};
+      const nameByNo = {
+        "1580": "Fordran kortbetalningar (Stripe)",
+        "1581": "Fordran kortbetalningar (Klarna)",
+        "1930": "Företagskonto/bank",
+        "6045": "Kortavgifter",
+        "6570": "Bankkostnader",
+        "2611": "Utgående moms 25 %",
+        "3011": "Försäljning varor 25 %",
+        "3520": "Fakturerade frakter",
+      };
+      const added = [];
+      for (const ln of lines){
+        const no = normalizeAccountNo(ln.account);
+        if (!no) continue;
+        if (state.accounts[no]) continue;
+        state.accounts[no] = { name: nameByNo[no] || `Import (webshop) ${no}`, type: guessTypeFromAccountNo(no) };
+        added.push(no);
+      }
+      if (added.length){
+        try { appendAudit({ action:"account.auto_add", entityType:"account", entityId: added.join(","), yearId, details:{ source:"webshop", accounts: added } }); } catch {}
+      }
+    } catch (e){ console.error(e); }
+
+    const sum = lines.reduce((s,l)=> s + (Number(l.amount)||0), 0);
+    if (Math.abs(sum) > 0.00001) throw new Error("Verifikationen är inte i balans");
+
+    const v = {
+      id: crypto.randomUUID(),
+      yearId,
+      series: seriesNorm,
+      no,
+      date,
+      text,
+      regDate,
+      sign,
+      lines,
+      correctionOf: null,
+      status: "active",
+      importedFrom: { source: String(p.source || "webshop"), kind: String(p.kind || ""), order_id: String(p.order_id || ""), order_number: String(p.order_number || "") }
+    };
+
+    state.vouchers = state.vouchers || [];
+    state.vouchers.push(v);
+    state.vouchers.sort((a,b)=> (a.yearId+b.series+a.no+a.date).localeCompare(b.yearId+a.series+b.no+b.date, "sv"));
+    return v;
+  }
+
+  async function webshopPull({ apiBaseUrl, apiKey, pullLimit }){
+    const base = stripTrailingSlashes(apiBaseUrl);
+    const url = `${base}/api/fu/pull?limit=${encodeURIComponent(String(pullLimit || 20))}`;
+    const res = await fetch(url, {
+      method: "GET",
+      headers: { "X-FU-Key": String(apiKey || "") }
+    });
+    const data = await res.json().catch(()=> null);
+    if (!res.ok) throw new Error((data && data.error) ? String(data.error) : `HTTP ${res.status}`);
+    if (!data || data.ok !== true) throw new Error((data && data.error) ? String(data.error) : "Okänt fel");
+    return Array.isArray(data.payloads) ? data.payloads : [];
+  }
+
+  function stripTrailingSlashes(url){
+    let s = String(url || "");
+    while (s.endsWith("/")) s = s.slice(0, -1);
+    return s;
+  }
+
+  async function webshopAck({ apiBaseUrl, apiKey, id, ok, voucher_id, error }){
+    const base = stripTrailingSlashes(apiBaseUrl);
+    const url = `${base}/api/fu/ack`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "X-FU-Key": String(apiKey || ""),
+      },
+      body: JSON.stringify({ id, ok: !!ok, voucher_id: voucher_id ?? null, error: error ?? null }),
+    });
+    const data = await res.json().catch(()=> null);
+    if (!res.ok) throw new Error((data && data.error) ? String(data.error) : `HTTP ${res.status}`);
+    return data;
+  }
+
+  async function webshopProbeAuth({ apiBaseUrl, apiKey }){
+    const base = stripTrailingSlashes(apiBaseUrl);
+    const url = `${base}/api/fu/ack`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "X-FU-Key": String(apiKey || ""),
+      },
+      body: JSON.stringify({ id: "__fu_probe__", ok: false, voucher_id: null, error: "auth-probe" }),
+    });
+
+    // If we reach this endpoint and get anything other than 401/403,
+    // we know the key + CORS are working. We intentionally avoid /pull
+    // since it can consume queued payloads.
+    if (res.status === 401 || res.status === 403) throw new Error("Forbidden");
+    if (res.status === 404) throw new Error("HTTP 404");
+    return true;
+  }
+
+  const __wsKeyStoreAttempted = Object.create(null);
+
+  function wsCredentialIdFromConfig({ companyId, orgnr, apiBaseUrl } = {}){
+    const cid = String(companyId || "").trim() || "fu";
+    const on = String(orgnr || "").trim();
+    const org = on ? on.replace(/[^0-9\-]/g, "") : "";
+
+    const base = stripTrailingSlashes(String(apiBaseUrl || "").trim());
+    let host = "";
+    try {
+      const u = new URL(base);
+      host = String(u.host || "");
+    } catch {
+      host = base ? String(base).replace(/^https?:\/\//i, "") : "";
+    }
+    host = String(host || "").split("/")[0].trim();
+
+    // Prefer org.nr when available; it stays stable even if the local company id changes.
+    const stableId = org ? org : cid;
+    return host ? `ws:${stableId}@${host}` : `ws:${stableId}`;
+  }
+
+  function updateWsCredIdPreview(){
+    if (!wsCredIdPreview) return;
+    try {
+      const companyId = (typeof CompanyManager !== "undefined" && CompanyManager && CompanyManager.getActiveCompanyId) ? CompanyManager.getActiveCompanyId() : null;
+      const apiBaseUrl = wsApiBaseUrl ? String(wsApiBaseUrl.value || "").trim() : "";
+      const orgnr = sOrgnr ? String(sOrgnr.value || "").trim() : (state && state.company && state.company.orgnr ? String(state.company.orgnr).trim() : "");
+
+      if (!companyId){
+        wsCredIdPreview.textContent = "Sparas som: – (välj företag)";
+        return;
+      }
+      if (!apiBaseUrl){
+        wsCredIdPreview.textContent = "";
+        return;
+      }
+
+      const id = wsCredentialIdFromConfig({ companyId, orgnr, apiBaseUrl });
+      const hint = orgnr ? "" : " (tips: fyll i org.nr för stabilt id)";
+      wsCredIdPreview.textContent = `Sparas som: ${id}${hint}`;
+    } catch {
+      wsCredIdPreview.textContent = "";
+    }
+  }
+
+  async function storePasswordCredential({ id, password, name } = {}){
+    const pwd = String(password || "");
+    const uid = String(id || "").trim();
+    if (!uid) throw new Error("Saknar id");
+    if (!pwd) throw new Error("Nyckeln är tom");
+
+    // Password manager integration requires secure contexts in practice.
+    if (!window.isSecureContext) throw new Error("Kräver HTTPS (secure context)");
+    if (!navigator.credentials || typeof navigator.credentials.store !== "function") throw new Error("Lösenordshanterare stöds ej här");
+
+    let cred = null;
+    if (window.PasswordCredential){
+      try {
+        // Some browsers support the dictionary constructor.
+        cred = new PasswordCredential({ id: uid, password: pwd, name: String(name || "") });
+      } catch {
+        cred = null;
+      }
+      if (!cred){
+        try {
+          // Fallback: create from a form (widely supported in Chromium).
+          const form = document.createElement("form");
+          const u = document.createElement("input");
+          u.name = "username";
+          u.autocomplete = "username";
+          u.value = uid;
+          const p = document.createElement("input");
+          p.name = "password";
+          p.type = "password";
+          p.autocomplete = "current-password";
+          p.value = pwd;
+          form.appendChild(u);
+          form.appendChild(p);
+          cred = new PasswordCredential(form);
+        } catch {
+          cred = null;
+        }
+      }
+    }
+
+    if (!cred) throw new Error("Kunde inte skapa credential");
+    await navigator.credentials.store(cred);
+    return true;
+  }
+
+  async function maybeStoreWebshopKeyInPasswordManager({ companyId, orgnr, apiBaseUrl, apiKey, companyName, reason } = {}){
+    const key = `${String(companyId || "")}\n${String(apiBaseUrl || "")}\n${String(apiKey || "")}`;
+    if (__wsKeyStoreAttempted[key]) return false;
+    __wsKeyStoreAttempted[key] = true;
+
+    const id = wsCredentialIdFromConfig({ companyId, orgnr, apiBaseUrl });
+    const nm = companyName ? `FU Webshop (${String(companyName).trim()}${orgnr ? ` · ${String(orgnr).trim()}` : ""})` : "FU Webshop";
+    await storePasswordCredential({ id, password: apiKey, name: nm });
+    console.info("[Webshop] stored key in password manager", reason || "");
+    return true;
+  }
+
+  function explainWebshopFetchError(err){
+    const raw = String((err && (err.message || err.name)) ? (err.message || err.name) : err);
+    const msg = raw || "Okänt fel";
+
+    // Browser fetch throws TypeError("Failed to fetch") for CORS, DNS, TLS, blocked requests etc.
+    const isFailedToFetch = /failed to fetch/i.test(msg) || (err && err.name === "TypeError" && /failed to fetch/i.test(String(err.message || "")));
+    if (!isFailedToFetch) return msg;
+
+    const origin = (()=>{
+      try { return String(location.origin || ""); } catch { return ""; }
+    })();
+
+    const httpsHint = (()=>{
+      try {
+        const proto = String(location.protocol || "").toLowerCase();
+        return proto === "http:" ? " Du kör på HTTP; testa HTTPS (secure context) om möjligt." : "";
+      } catch { return ""; }
+    })();
+
+    return `Failed to fetch. Trolig orsak: CORS/origin-block. Tillåt origin ${origin || "(okänd)"} i backenden (CORS_ALLOW_ORIGINS) och tillåt headers X-FU-Key, Content-Type samt metoder GET/POST/OPTIONS.${httpsHint}`;
+  }
+
+  async function runWebshopTestFromUi(){
+    const companyId = (typeof CompanyManager !== "undefined" && CompanyManager && CompanyManager.getActiveCompanyId) ? CompanyManager.getActiveCompanyId() : null;
+    if (!companyId) return showToast("Välj ett företag innan test.", 5500);
+
+    state.company = state.company || defaultData().company;
+    const cfgFromState = normalizeWebshopSync(state.company.webshopSync);
+
+    const cfg = normalizeWebshopSync({
+      enabled: wsEnabled ? wsEnabled.checked : cfgFromState.enabled,
+      apiBaseUrl: wsApiBaseUrl ? wsApiBaseUrl.value : cfgFromState.apiBaseUrl,
+      apiKey: wsApiKey ? wsApiKey.value : cfgFromState.apiKey,
+      series: wsSeries ? wsSeries.value : cfgFromState.series,
+      pullLimit: wsLimit ? wsLimit.value : cfgFromState.pullLimit,
+    });
+
+    if (!cfg.apiBaseUrl) return showToast("Ange API base URL.", 5500);
+    if (!cfg.apiKey) return showToast("Ange X-FU-Key.", 5500);
+
+    const runLabel = new Date().toLocaleString("sv-SE");
+    setWebshopStatus(`Senast: ${runLabel} · Testar nyckel…`);
+
+    await webshopProbeAuth({ apiBaseUrl: cfg.apiBaseUrl, apiKey: cfg.apiKey });
+    setWebshopStatus(`Senast: ${runLabel} · Test OK. Nyckel giltig.`);
+    showToast("Test OK (nyckel giltig).", 3500);
+  }
+
+  async function runWebshopImportFromUi(){
+    const companyId = (typeof CompanyManager !== "undefined" && CompanyManager && CompanyManager.getActiveCompanyId) ? CompanyManager.getActiveCompanyId() : null;
+    if (!companyId) return showToast("Välj ett företag innan import.", 5500);
+
+    state.company = state.company || defaultData().company;
+    const cfgFromState = normalizeWebshopSync(state.company.webshopSync);
+
+    const cfg = normalizeWebshopSync({
+      enabled: wsEnabled ? wsEnabled.checked : cfgFromState.enabled,
+      apiBaseUrl: wsApiBaseUrl ? wsApiBaseUrl.value : cfgFromState.apiBaseUrl,
+      apiKey: wsApiKey ? wsApiKey.value : cfgFromState.apiKey,
+      series: wsSeries ? wsSeries.value : cfgFromState.series,
+      pullLimit: wsLimit ? wsLimit.value : cfgFromState.pullLimit,
+    });
+
+    if (!cfg.enabled) return showToast("Webshop-synk är inte aktiverad för detta företag.", 5500);
+    if (!cfg.apiBaseUrl) return showToast("Ange API base URL.", 5500);
+    if (!cfg.apiKey) return showToast("Ange X-FU-Key.", 5500);
+
+    const runLabel = new Date().toLocaleString("sv-SE");
+    setWebshopStatus(`Senast: ${runLabel} · Hämtar kö…`);
+    const payloads = await webshopPull({ apiBaseUrl: cfg.apiBaseUrl, apiKey: cfg.apiKey, pullLimit: cfg.pullLimit });
+    if (!payloads.length){
+      setWebshopStatus(`Senast: ${runLabel} · Inget att importera.`);
+      showToast("Inga nya händelser i kö.", 3500);
+      return;
+    }
+
+    let okCount = 0;
+    let errCount = 0;
+    let skipCount = 0;
+
+    for (const item of payloads){
+      const payloadId = String(item?.id || "");
+      const p = item?.payload;
+      if (!payloadId){
+        errCount++;
+        continue;
+      }
+
+      // Idempotent-ish: never create duplicates if the same payload is pulled twice.
+      if (isWebshopPayloadImported(companyId, payloadId)){
+        const prevVoucherId = getImportedVoucherId(companyId, payloadId);
+        try { await webshopAck({ apiBaseUrl: cfg.apiBaseUrl, apiKey: cfg.apiKey, id: payloadId, ok: true, voucher_id: prevVoucherId ?? null }); } catch (_) {}
+        skipCount++;
+        continue;
+      }
+      try {
+        const v = voucherFromWebshopPayload(p, { series: cfg.series });
+        const voucher_id = `${v.series}${v.no}`;
+        markWebshopPayloadImported(companyId, payloadId, voucher_id);
+        try {
+          appendAudit({ action:"voucher.import", actor: v.sign || undefined, entityType:"voucher", entityId: v.id, yearId: v.yearId, details:{ source:"webshop", payloadId, voucher_id, order_id: item?.order_id || null, kind: item?.kind || null } });
+        } catch {}
+        save({ renderAll: false });
+        await webshopAck({ apiBaseUrl: cfg.apiBaseUrl, apiKey: cfg.apiKey, id: payloadId, ok: true, voucher_id });
+        okCount++;
+      } catch (e){
+        const msg = String((e && e.message) ? e.message : e);
+        try { await webshopAck({ apiBaseUrl: cfg.apiBaseUrl, apiKey: cfg.apiKey, id: payloadId, ok: false, error: msg }); } catch (_) {}
+        errCount++;
+      }
+    }
+
+    try { renderVouchers(); } catch {}
+    setWebshopStatus(`Senast: ${runLabel} · OK: ${okCount}, hoppade: ${skipCount}, fel: ${errCount}.`);
+    showToast(`Webshop-import klar. OK: ${okCount}, hoppade: ${skipCount}, fel: ${errCount}.`, 5500);
+  }
 
   function renderLogoPreview(){
     if (!logoPreview) return;
@@ -4227,11 +5207,46 @@ if (!d.features) d.features = { sruEnabled: false };
     state.company.invoiceNote = (sInvNote?.value || "").trim();
     state.company.invoiceFooter = (sInvFooter?.value || "").trim();
 
+    // Webshop sync add-on (per company)
+    state.company.webshopSync = normalizeWebshopSync({
+      enabled: !!(wsEnabled && wsEnabled.checked),
+      apiBaseUrl: (wsApiBaseUrl?.value || "").trim(),
+      apiKey: (wsApiKey?.value || "").trim(),
+      series: (wsSeries?.value || "W").trim(),
+      pullLimit: parseInt(String(wsLimit?.value || "").trim(), 10),
+    });
+
     state.features.sruEnabled = !!(sSruEnabled && sSruEnabled.checked);
+
+    // Keep multi-company registry metadata updated (so the company selector reflects settings)
+    try {
+      if (typeof CompanyManager !== "undefined" && CompanyManager && CompanyManager.hasActiveCompany && CompanyManager.hasActiveCompany()){
+        CompanyManager.updateActiveCompanyMeta({
+          name: state.company.name ? String(state.company.name).trim() : "(namnlöst företag)",
+          orgnr: state.company.orgnr ? String(state.company.orgnr).trim() : "",
+          lastOpenedISO: nowISO(),
+        });
+        CompanyManager.updateCompanySelectUI();
+      }
+    } catch {}
 
     if (companyNameEl) companyNameEl.textContent = state.company.name || "FU-BOOKKEEPING";
     const ok = save();
     if (ok) showToast("Dina inställningar är sparade");
+
+    // Best-effort: also store the X-FU-Key in the browser password manager
+    // (requires HTTPS + Chromium, may prompt user). Never block saving.
+    try {
+      const ws = normalizeWebshopSync(state.company.webshopSync);
+      const companyId = (typeof CompanyManager !== "undefined" && CompanyManager && CompanyManager.getActiveCompanyId) ? CompanyManager.getActiveCompanyId() : null;
+      if (ws.enabled && ws.apiKey && companyId){
+        const cname = state.company && state.company.name ? String(state.company.name).trim() : "";
+        const orgnr = state.company && state.company.orgnr ? String(state.company.orgnr).trim() : "";
+        maybeStoreWebshopKeyInPasswordManager({ companyId, orgnr, apiBaseUrl: ws.apiBaseUrl, apiKey: ws.apiKey, companyName: cname, reason: "saveSettings" })
+          .then(()=>{ showToast("Nyckeln kan nu sparas i lösenordshanteraren (om webbläsaren frågar).", 4500); })
+          .catch(()=>{ /* ignore */ });
+      }
+    } catch {}
   }
 
   const fyStart = document.getElementById("fyStart");
@@ -4387,6 +5402,23 @@ if (!d.features) d.features = { sruEnabled: false };
 
     if (sInvNote) sInvNote.value = c.invoiceNote || "";
     if (sInvFooter) sInvFooter.value = c.invoiceFooter || "";
+
+    // Webshop sync add-on
+    const ws = normalizeWebshopSync(c.webshopSync);
+    if (wsEnabled) wsEnabled.checked = !!ws.enabled;
+    if (wsApiBaseUrl) wsApiBaseUrl.value = ws.apiBaseUrl || "";
+    if (wsApiKey) wsApiKey.value = ws.apiKey || "";
+    if (wsSeries) wsSeries.value = ws.series || "W";
+    if (wsLimit) wsLimit.value = String(ws.pullLimit ?? 1);
+    setWebshopStatus("");
+    try { updateWsCredIdPreview(); } catch {}
+
+    // Help is per-session UI state; keep collapsed by default.
+    try {
+      if (wsKeyHelp) wsKeyHelp.hidden = true;
+      if (btnWsKeyHelp) btnWsKeyHelp.setAttribute("aria-expanded", "false");
+      if (btnWsKeyHelp) btnWsKeyHelp.textContent = "Hjälp";
+    } catch {}
 
     if (sSruEnabled) sSruEnabled.checked = !!(state.features && state.features.sruEnabled);
 
@@ -11300,6 +12332,95 @@ if (rptYearSelect){
     });
   }
 
+  if (btnWsQuickImport) btnWsQuickImport.addEventListener("click", async (e)=>{
+    try { if (e && e.preventDefault) e.preventDefault(); } catch {}
+    try {
+      await runWebshopImportFromUi();
+    } catch (err) {
+      console.error(err);
+      showToast("Kunde inte importera. Se konsolen.", 8000);
+    }
+  });
+
+  if (btnWsImport){
+    btnWsImport.addEventListener("click", async (e)=>{
+      e.preventDefault();
+      const prev = btnWsImport.disabled;
+      btnWsImport.disabled = true;
+      try {
+        await runWebshopImportFromUi();
+      } catch (err){
+        console.error(err);
+        const msg = explainWebshopFetchError(err);
+        setWebshopStatus("Fel: " + msg);
+        showToast(`Webshop-import misslyckades: ${msg}`, 9000);
+      } finally {
+        btnWsImport.disabled = prev;
+      }
+    });
+  }
+
+  if (btnWsTest){
+    btnWsTest.addEventListener("click", async (e)=>{
+      e.preventDefault();
+      const prev = btnWsTest.disabled;
+      btnWsTest.disabled = true;
+      try {
+        await runWebshopTestFromUi();
+      } catch (err){
+        console.error(err);
+        const msg = explainWebshopFetchError(err);
+        setWebshopStatus("Test misslyckades: " + msg);
+        showToast(`Test misslyckades: ${msg}`, 9000);
+      } finally {
+        btnWsTest.disabled = prev;
+      }
+    });
+  }
+
+  if (btnWsSaveKeyMgr){
+    btnWsSaveKeyMgr.addEventListener("click", async (e)=>{
+      e.preventDefault();
+      try {
+        const companyId = (typeof CompanyManager !== "undefined" && CompanyManager && CompanyManager.getActiveCompanyId) ? CompanyManager.getActiveCompanyId() : null;
+        if (!companyId) return showToast("Välj ett företag först.", 5500);
+
+        state.company = state.company || defaultData().company;
+        const cfgFromState = normalizeWebshopSync(state.company.webshopSync);
+        const cfg = normalizeWebshopSync({
+          enabled: wsEnabled ? wsEnabled.checked : cfgFromState.enabled,
+          apiBaseUrl: wsApiBaseUrl ? wsApiBaseUrl.value : cfgFromState.apiBaseUrl,
+          apiKey: wsApiKey ? wsApiKey.value : cfgFromState.apiKey,
+          series: wsSeries ? wsSeries.value : cfgFromState.series,
+          pullLimit: wsLimit ? wsLimit.value : cfgFromState.pullLimit,
+        });
+
+        if (!cfg.apiBaseUrl) return showToast("Ange serveradress först.", 5500);
+        if (!cfg.apiKey) return showToast("Ange X-FU-Key först.", 5500);
+
+        const cname = state.company && state.company.name ? String(state.company.name).trim() : "";
+        const orgnr = state.company && state.company.orgnr ? String(state.company.orgnr).trim() : "";
+        await maybeStoreWebshopKeyInPasswordManager({ companyId, orgnr, apiBaseUrl: cfg.apiBaseUrl, apiKey: cfg.apiKey, companyName: cname, reason: "btnWsSaveKeyMgr" });
+        showToast("Försökte spara nyckeln i lösenordshanteraren (se ev. prompt).", 5500);
+      } catch (err){
+        console.error(err);
+        const msg = String((err && (err.message || err.name)) ? (err.message || err.name) : err);
+        showToast(`Kunde inte spara i lösenordshanteraren: ${msg}`, 9000);
+      }
+    });
+  }
+
+  if (btnWsKeyHelp){
+    btnWsKeyHelp.addEventListener("click", (e)=>{
+      e.preventDefault();
+      if (!wsKeyHelp) return;
+      const nextHidden = !wsKeyHelp.hidden ? true : false;
+      wsKeyHelp.hidden = nextHidden;
+      try { btnWsKeyHelp.setAttribute("aria-expanded", nextHidden ? "false" : "true"); } catch {}
+      try { btnWsKeyHelp.textContent = nextHidden ? "Hjälp" : "Dölj"; } catch {}
+    });
+  }
+
   if (btnRemoveLogo){
     btnRemoveLogo.addEventListener("click", (e)=>{
       e.preventDefault();
@@ -11379,7 +12500,7 @@ try {
   if (typeof applyStdAccountsMapRepair === "function"){
     const r = applyStdAccountsMapRepair({ onlyReplacement: true });
     if (r && r.updated){
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e){ console.error(e); }
+      try { localStorage.setItem(storageKeyForActiveCompany(), JSON.stringify(state)); } catch (e){ console.error(e); }
     }
   }
 } catch (e){ console.error(e); }
@@ -11503,27 +12624,48 @@ if (companySelect) companySelect.addEventListener("change", async ()=>{
     await maybeSilentAutosaveToFile("switch-company");
     await CompanyManager.setActiveCompany(targetId);
 
-    // Clear local state to avoid mixing companies if load fails
-    try { await wipeLocalDataForNewDataFile(); } catch {}
-
-    if (!fsHandle){
-      showToast("Företaget saknar kopplad datafil.", 4500);
-      return;
+    const requireFile = !!(state && state.fileSync && state.fileSync.requireFile);
+    if (fsHandle){
+      try {
+        await fsLoadState();
+        showToast("Bytte företag.", 2500);
+      } catch (e){
+        console.error(e);
+        showToast("Kunde inte ladda företagets datafil. Se konsolen.", 7000);
+      }
+    } else {
+      if (requireFile){
+        showToast("Företaget saknar kopplad datafil (fil krävs).", 6500);
+      }
+      // Load localStorage state for this company.
+      try {
+        state = normalizeImportedState(load());
+        try { updateFsUI(); } catch {}
+        try { updateBackupUI(); } catch {}
+        try { renderAll(); } catch {}
+        showToast("Bytte företag.", 2500);
+      } catch (e){
+        console.error(e);
+        showToast("Kunde inte ladda företagets localStorage-data.", 7000);
+      }
     }
 
-    try {
-      await fsLoadState();
-      showToast("Bytte företag.", 2500);
-    } catch (e){
-      console.error(e);
-      showToast("Kunde inte ladda företagets datafil. Se konsolen.", 7000);
-    }
+    try { updateWsCredIdPreview(); } catch {}
   } catch (e){
     console.error(e);
   }
 });
 
 // --- File Sync wiring (UI moved to Settings) ---
+if (btnWorkfileFix) btnWorkfileFix.addEventListener("click", (e)=>{
+  e.preventDefault();
+  try { activateTab("settings"); } catch {}
+  try {
+    const el = document.getElementById("workfileCard");
+    if (el && el.scrollIntoView) el.scrollIntoView({ block: "start" });
+  } catch {}
+});
+
 if (btnConnectFile) btnConnectFile.addEventListener("click", async (e)=>{ e.preventDefault(); await fsConnectExisting(); });
 if (btnCreateFile) btnCreateFile.addEventListener("click", async (e)=>{ e.preventDefault(); await fsCreateNew(); });
 if (btnLoadFromFile) btnLoadFromFile.addEventListener("click", async (e)=>{
@@ -11545,6 +12687,10 @@ if (btnDisconnectFile) btnDisconnectFile.addEventListener("click", async (e)=>{ 
 
 if (fsAutosave) fsAutosave.addEventListener("change", ()=>{ state.fileSync = state.fileSync || { autosave:true, requireFile:false }; state.fileSync.autosave = !!fsAutosave.checked; save(); updateFsUI(); });
 if (fsRequireFile) fsRequireFile.addEventListener("change", ()=>{ state.fileSync = state.fileSync || { autosave:true, requireFile:false }; state.fileSync.requireFile = !!fsRequireFile.checked; save(); updateFsUI(); });
+
+// Webshop key password-manager: live preview of computed username
+if (wsApiBaseUrl) wsApiBaseUrl.addEventListener("input", ()=>{ try { updateWsCredIdPreview(); } catch {} });
+if (sOrgnr) sOrgnr.addEventListener("input", ()=>{ try { updateWsCredIdPreview(); } catch {} });
 
 // Init company registry + restore active company handles (and attempt silent auto-load)
 (async ()=>{
