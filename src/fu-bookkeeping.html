@@ -499,11 +499,680 @@
     .splashText{ margin:10px 0 0 0; color:var(--muted); font-size:13px; line-height:1.45; }
     .splashActions{ display:flex; justify-content:flex-end; gap:10px; margin-top:14px; flex-wrap:wrap; }
 
-  </style>
+  
+  /* =========================================================
+     Mobile application shell
+     ========================================================= */
+
+  .mobileAppBar,
+  .mobileBottomNav,
+  .mobileMoreBackdrop,
+  .mobileMoreSheet {
+    display: none;
+  }
+
+  .mobileTableScroll {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-inline: contain;
+  }
+
+  @media (max-width: 760px) {
+    html,
+    body {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: clip;
+    }
+
+    body {
+      padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    img,
+    svg,
+    canvas,
+    video {
+      max-width: 100%;
+    }
+
+    main,
+    main > .wrap,
+    .layout,
+    .content,
+    .content > section,
+    .grid,
+    .card,
+    .row,
+    .field {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    /*
+      Inline desktop widths are common in the current app.
+      On mobile they must not force the document wider than the viewport.
+    */
+    .content [style*="min-width"] {
+      min-width: 0 !important;
+    }
+
+    .content [style*="grid-column:span 2"],
+    .content [style*="grid-column: span 2"] {
+      grid-column: 1 / -1 !important;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: none;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    /* Compact app bar */
+    .mobileAppBar {
+      position: sticky;
+      top: 0;
+      z-index: 950;
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      min-height: 58px;
+      padding:
+        calc(7px + env(safe-area-inset-top, 0px))
+        12px
+        7px;
+      background: rgba(11, 15, 20, .97);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .mobileAppLogo {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+    }
+
+    .mobileAppHeading {
+      min-width: 0;
+    }
+
+    .mobileAppName {
+      overflow: hidden;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.2;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .mobilePageTitle {
+      overflow: hidden;
+      margin-top: 2px;
+      font-size: 17px;
+      font-weight: 750;
+      line-height: 1.2;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .mobileStatusButton {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 38px;
+      min-height: 38px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(var(--card-rgb), .9);
+      color: var(--text);
+    }
+
+    .mobileStatusDot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #d3933b;
+      box-shadow: 0 0 0 4px rgba(211, 147, 59, .14);
+    }
+
+    .mobileStatusButton.is-ok .mobileStatusDot {
+      background: #54b982;
+      box-shadow: 0 0 0 4px rgba(84, 185, 130, .14);
+    }
+
+    .mobileStatusButton.is-bad .mobileStatusDot {
+      background: #db6262;
+      box-shadow: 0 0 0 4px rgba(219, 98, 98, .14);
+    }
+
+    /* Existing desktop header becomes a compact account/status strip */
+    header {
+      position: relative;
+      z-index: 100;
+      border-bottom: 1px solid var(--line);
+    }
+
+    header .wrap {
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+
+    .header-row {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 7px !important;
+      align-items: stretch !important;
+    }
+
+    .header-row .brand {
+      display: none !important;
+    }
+
+    .header-row > .field {
+      display: contents;
+    }
+
+    #companySelect,
+    #yearPillSelect {
+      width: 100%;
+      min-height: 42px;
+      font-size: 15px;
+    }
+
+    #bootPill,
+    #revPill {
+      display: none !important;
+    }
+
+    #storagePill,
+    #backupPill {
+      overflow: hidden;
+      min-width: 0;
+      padding: 7px 10px;
+      font-size: 11px;
+      line-height: 1.25;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Desktop sidebar is replaced by bottom navigation */
+    .layout {
+      display: block !important;
+    }
+
+    .sidebar {
+      display: none !important;
+    }
+
+    .content {
+      width: 100% !important;
+      padding-top: 10px;
+    }
+
+    main > .wrap {
+      padding-top: 0;
+    }
+
+    /* Lighter mobile spacing */
+    .grid {
+      gap: 10px !important;
+    }
+
+    .grid.two {
+      grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    .card {
+      margin: 0;
+      padding: 12px;
+      border-radius: 14px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, .2);
+    }
+
+    .card .card {
+      padding: 10px !important;
+      border-radius: 12px !important;
+    }
+
+    h2 {
+      font-size: 18px;
+      line-height: 1.25;
+    }
+
+    .row {
+      min-width: 0;
+      flex-wrap: wrap;
+      gap: 8px !important;
+    }
+
+    .row > .field {
+      flex: 1 1 145px;
+    }
+
+    .field {
+      width: 100%;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+      max-width: 100%;
+      min-width: 0;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      font-size: 16px;
+    }
+
+    .btn {
+      min-height: 42px;
+      white-space: normal;
+    }
+
+    /* Workfile warning */
+    .workfileBanner .wfRow {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .workfileBanner .wfActions {
+      width: 100%;
+    }
+
+    .workfileBanner .wfActions > * {
+      width: 100%;
+    }
+
+    /* Tables scroll inside their own container */
+    .mobileTableScroll {
+      margin-inline: -2px;
+      padding-bottom: 4px;
+    }
+
+    .mobileTableScroll table {
+      width: max-content;
+      min-width: 680px;
+    }
+
+    .mobileTableScroll .linesTable {
+      min-width: 720px !important;
+      table-layout: auto !important;
+    }
+
+    .mobileTableScroll .biInboxTable {
+      min-width: 1500px !important;
+    }
+
+    /* Fixed bottom navigation */
+    .mobileBottomNav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1100;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 2px;
+      padding:
+        6px
+        6px
+        calc(6px + env(safe-area-inset-bottom, 0px));
+      background: rgba(11, 15, 20, .97);
+      border-top: 1px solid var(--line);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .mobileNavButton {
+      display: grid;
+      justify-items: center;
+      gap: 3px;
+      min-width: 0;
+      min-height: 54px;
+      padding: 6px 2px;
+      border: 0;
+      border-radius: 11px;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 10px;
+      line-height: 1.05;
+    }
+
+    .mobileNavButton .mobileNavIcon {
+      font-size: 19px;
+      line-height: 1;
+    }
+
+    .mobileNavButton.active {
+      background: rgba(67, 132, 215, .16);
+      color: var(--text);
+    }
+
+    /* More-sheet */
+    .mobileMoreBackdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 1180;
+      display: none;
+      background: rgba(0, 0, 0, .55);
+    }
+
+    .mobileMoreBackdrop.open {
+      display: block;
+    }
+
+    .mobileMoreSheet {
+      position: fixed;
+      left: 8px;
+      right: 8px;
+      bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+      z-index: 1200;
+      display: none;
+      max-height: min(72vh, 620px);
+      overflow-y: auto;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(18, 22, 29, .99);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, .55);
+    }
+
+    .mobileMoreSheet.open {
+      display: block;
+    }
+
+    .mobileMoreHandle {
+      width: 44px;
+      height: 4px;
+      margin: 2px auto 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .25);
+    }
+
+    .mobileMoreHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      padding: 2px 4px;
+    }
+
+    .mobileMoreHeader strong {
+      font-size: 18px;
+    }
+
+    .mobileMoreClose {
+      width: 38px;
+      height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text);
+      font-size: 20px;
+    }
+
+    .mobileMoreGroup {
+      display: grid;
+      gap: 7px;
+      margin-top: 12px;
+    }
+
+    .mobileMoreGroupTitle {
+      padding: 0 5px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .mobileMoreItem {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      width: 100%;
+      min-height: 48px;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(var(--card-rgb), .82);
+      color: var(--text);
+      text-align: left;
+      font: inherit;
+    }
+
+    .mobileMoreItem::after {
+      content: "›";
+      color: var(--muted);
+      font-size: 20px;
+    }
+
+    body.mobileSheetOpen {
+      overflow: hidden;
+    }
+
+    body.quote-workspace-open .mobileBottomNav,
+    body.quote-workspace-open .mobileAppBar {
+      display: none !important;
+    }
+  }
+
+</style>
 
   <!-- OCR (offline i webbläsaren: körs lokalt, inga filer laddas upp) -->
   <script defer src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.0.379/legacy/build/pdf.min.js"></script>
+
+
+<style id="mobileVoucherLineCards">
+@media (max-width: 760px) {
+  /*
+    Verifikationsrader visas som mobilkort i stället för en ihoptryckt
+    femkolumnstabell. Desktoptabellen påverkas inte.
+  */
+  .mobileTableScroll:has(.linesTable) {
+    overflow: visible;
+    padding: 0;
+    margin: 0;
+  }
+
+  .linesTable {
+    display: block;
+    width: 100%;
+    min-width: 0 !important;
+    table-layout: auto !important;
+  }
+
+  .linesTable thead {
+    display: none;
+  }
+
+  .linesTable tbody {
+    display: grid;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .linesTable tr {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px;
+    width: 100%;
+    padding: 42px 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(11, 18, 32, .76);
+  }
+
+  .linesTable tr::before {
+    content: "Rad " attr(data-line-number);
+    position: absolute;
+    top: 13px;
+    left: 12px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 750;
+  }
+
+  .linesTable td {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    text-align: left !important;
+  }
+
+  /* Konto och radtext använder full bredd */
+  .linesTable td:nth-child(1),
+  .linesTable td:nth-child(2) {
+    grid-column: 1 / -1;
+  }
+
+  /* Debet och kredit ligger sida vid sida */
+  .linesTable td:nth-child(3) {
+    grid-column: 1;
+  }
+
+  .linesTable td:nth-child(4) {
+    grid-column: 2;
+  }
+
+  /* Ta bort-knappen i övre högra hörnet */
+  .linesTable td:nth-child(5) {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    width: auto;
+  }
+
+  .linesTable td:nth-child(5) .btn {
+    width: 34px;
+    min-height: 34px;
+    padding: 4px;
+    border-radius: 10px;
+  }
+
+  .linesTable td::before {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .linesTable td:nth-child(1)::before {
+    content: "Konto";
+  }
+
+  .linesTable td:nth-child(2)::before {
+    content: "Radtext";
+  }
+
+  .linesTable td:nth-child(3)::before {
+    content: "Debet";
+  }
+
+  .linesTable td:nth-child(4)::before {
+    content: "Kredit";
+  }
+
+  .linesTable td:nth-child(5)::before {
+    display: none;
+  }
+
+  .linesTable select,
+  .linesTable input {
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+  }
+
+  .linesTable select {
+    font-size: 16px;
+  }
+
+  .mobileAccountPreview {
+    display: block;
+    margin-top: 6px;
+    padding: 0 2px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  /*
+    Förbättra även huvudet för Ny verifikation:
+    Datum + serie, vernr + sign, text på full bredd.
+  */
+  #tab-vouchers > .grid.two > .card:first-child
+  > .grid > .row:first-child {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(90px, .65fr);
+    gap: 10px !important;
+    align-items: end;
+  }
+
+  #tab-vouchers > .grid.two > .card:first-child
+  > .grid > .row:first-child > .field {
+    width: 100%;
+    min-width: 0 !important;
+  }
+
+  #tab-vouchers > .grid.two > .card:first-child
+  > .grid > .row:first-child > .field:nth-child(1) {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  #tab-vouchers > .grid.two > .card:first-child
+  > .grid > .row:first-child > .field:nth-child(2) {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  #tab-vouchers > .grid.two > .card:first-child
+  > .grid > .row:first-child > .field:nth-child(3) {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  #tab-vouchers > .grid.two > .card:first-child
+  > .grid > .row:first-child > .field:nth-child(5) {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  #tab-vouchers > .grid.two > .card:first-child
+  > .grid > .row:first-child > .field:nth-child(4) {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+}
+</style>
 
 </head>
 <body class="splashActive">
@@ -582,6 +1251,33 @@
     });
   })();
 </script>
+
+
+<div class="mobileAppBar" id="mobileAppBar">
+  <img
+    class="mobileAppLogo"
+    src="FU-BookKeeping.png"
+    alt=""
+    aria-hidden="true"
+  />
+  <div class="mobileAppHeading">
+    <div class="mobileAppName" id="mobileCompanyName">
+      FU-BookKeeping
+    </div>
+    <div class="mobilePageTitle" id="mobilePageTitle">
+      Verifikationer
+    </div>
+  </div>
+  <button
+    type="button"
+    class="mobileStatusButton"
+    id="mobileStatusButton"
+    aria-label="Visa lagringsstatus"
+    title="Visa lagringsstatus"
+  >
+    <span class="mobileStatusDot"></span>
+  </button>
+</div>
 
 <header>
   <div class="wrap">
@@ -4682,8 +5378,7 @@ async function backupWriteJsonToDir(day){
     throw new Error("Ingen backupfil eller backupmapp vald");
   }
 
-  const json = JSON.stringify(state, null, 2) + "
-";
+  const json = JSON.stringify(state, null, 2) + "\n";
 
   if (
     nativeBackupSupported() &&
@@ -6969,7 +7664,11 @@ cur = {
           .card{ page-break-inside:avoid; }
         }
       </style>
-    </head><body>${bodyHtml}<script>window.onload=()=>window.print();<\/script></body></html>`;
+    </head><body>${bodyHtml}<script>window.onload=()=>window.print();<\/script>
+
+
+
+</body></html>`;
     const w = window.open("", "_blank");
     if (!w) return showToast("Popup blockerad. Tillåt popup för att skriva ut.", 6000);
     w.document.open();
@@ -18720,6 +19419,7 @@ if (!d.features) d.features = { sruEnabled: false };
 
     currentLines.forEach((ln, idx) => {
       const tr = document.createElement("tr");
+      tr.dataset.lineNumber = String(idx + 1);
 
       // account select
       const tdAcc = document.createElement("td");
@@ -18741,12 +19441,19 @@ if (!d.features) d.features = { sruEnabled: false };
       sel.value = ln.account;
       sel.title = accountLabel(ln.account || "");
       sel.disabled = voucherEditorReadOnly;
+      const accountPreview = document.createElement("div");
+      accountPreview.className = "mobileAccountPreview";
+      accountPreview.textContent = accountLabel(ln.account || "");
+
       sel.addEventListener("change", () => {
         ln.account = sel.value;
+        accountPreview.textContent = accountLabel(sel.value || "");
         setLineFieldTitles(sel, inpText, ln);
         updateBalanceBadge();
       });
+
       tdAcc.appendChild(sel);
+      tdAcc.appendChild(accountPreview);
 
       // text
       const tdText = document.createElement("td");
@@ -22858,5 +23565,453 @@ if (sOrgnr) sOrgnr.addEventListener("input", ()=>{ try { updateWsCredIdPreview()
   }, true);
 })();
 </script>
+
+<div
+  class="mobileMoreBackdrop"
+  id="mobileMoreBackdrop"
+  aria-hidden="true"
+></div>
+
+<div
+  class="mobileMoreSheet"
+  id="mobileMoreSheet"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Fler funktioner"
+>
+  <div class="mobileMoreHandle"></div>
+
+  <div class="mobileMoreHeader">
+    <strong>Mer</strong>
+    <button
+      type="button"
+      class="mobileMoreClose"
+      id="mobileMoreClose"
+      aria-label="Stäng meny"
+    >×</button>
+  </div>
+
+  <div class="mobileMoreGroup">
+    <div class="mobileMoreGroupTitle">Bokföring</div>
+    <button type="button" class="mobileMoreItem" data-mobile-tab="accounts">
+      Kontoplan
+    </button>
+    <button type="button" class="mobileMoreItem" data-mobile-tab="bank_inbox">
+      Inkorg: Bankrader
+    </button>
+    <button type="button" class="mobileMoreItem" data-mobile-action="bank-import">
+      Importera bank eller skattekonto
+    </button>
+  </div>
+
+  <div class="mobileMoreGroup">
+    <div class="mobileMoreGroupTitle">Försäljning</div>
+    <button type="button" class="mobileMoreItem" data-mobile-tab="quotes">
+      Offerter
+    </button>
+    <button type="button" class="mobileMoreItem" data-mobile-tab="customers">
+      Kunder
+    </button>
+    <button type="button" class="mobileMoreItem" data-mobile-tab="orderstock">
+      Orderstock
+    </button>
+  </div>
+
+  <div class="mobileMoreGroup">
+    <div class="mobileMoreGroupTitle">Inköp</div>
+    <button type="button" class="mobileMoreItem" data-mobile-tab="suppliers">
+      Leverantörer
+    </button>
+  </div>
+
+  <div class="mobileMoreGroup">
+    <div class="mobileMoreGroupTitle">Rapportering</div>
+    <button type="button" class="mobileMoreItem" data-mobile-tab="sru">
+      Deklaration (SRU)
+    </button>
+  </div>
+
+  <div class="mobileMoreGroup">
+    <div class="mobileMoreGroupTitle">Data och administration</div>
+    <button type="button" class="mobileMoreItem" data-mobile-tab="export">
+      Import och export
+    </button>
+    <button type="button" class="mobileMoreItem" data-mobile-tab="settings">
+      Inställningar
+    </button>
+    <button type="button" class="mobileMoreItem" data-mobile-action="webshop">
+      Webshop Import
+    </button>
+  </div>
+</div>
+
+<nav
+  class="mobileBottomNav"
+  id="mobileBottomNav"
+  aria-label="Huvudnavigation"
+>
+  <button
+    type="button"
+    class="mobileNavButton active"
+    data-mobile-tab="vouchers"
+  >
+    <span class="mobileNavIcon">▤</span>
+    <span>Bokför</span>
+  </button>
+
+  <button
+    type="button"
+    class="mobileNavButton"
+    data-mobile-tab="invoices"
+  >
+    <span class="mobileNavIcon">▧</span>
+    <span>Försäljning</span>
+  </button>
+
+  <button
+    type="button"
+    class="mobileNavButton"
+    data-mobile-tab="supplier_invoices"
+  >
+    <span class="mobileNavIcon">▣</span>
+    <span>Inköp</span>
+  </button>
+
+  <button
+    type="button"
+    class="mobileNavButton"
+    data-mobile-tab="reports"
+  >
+    <span class="mobileNavIcon">▥</span>
+    <span>Rapporter</span>
+  </button>
+
+  <button
+    type="button"
+    class="mobileNavButton"
+    id="mobileMoreOpen"
+  >
+    <span class="mobileNavIcon">•••</span>
+    <span>Mer</span>
+  </button>
+</nav>
+
+<script>
+(function(){
+  "use strict";
+
+  const pageTitles = {
+    vouchers: "Verifikationer",
+    accounts: "Kontoplan",
+    invoices: "Kundfakturor",
+    quotes: "Offerter",
+    customers: "Kunder",
+    orderstock: "Orderstock",
+    supplier_invoices: "Leverantörsfakturor",
+    suppliers: "Leverantörer",
+    reports: "Rapporter",
+    sru: "Deklaration",
+    bank_inbox: "Bankrader",
+    export: "Import och export",
+    settings: "Inställningar"
+  };
+
+  const primaryGroups = {
+    vouchers: "vouchers",
+    accounts: "vouchers",
+    invoices: "invoices",
+    quotes: "invoices",
+    customers: "invoices",
+    orderstock: "invoices",
+    supplier_invoices: "supplier_invoices",
+    suppliers: "supplier_invoices",
+    reports: "reports",
+    sru: "reports"
+  };
+
+  const sheet = document.getElementById("mobileMoreSheet");
+  const backdrop = document.getElementById("mobileMoreBackdrop");
+  const openButton = document.getElementById("mobileMoreOpen");
+  const closeButton = document.getElementById("mobileMoreClose");
+  const pageTitle = document.getElementById("mobilePageTitle");
+  const companyTitle = document.getElementById("mobileCompanyName");
+  const statusButton = document.getElementById("mobileStatusButton");
+
+  function isMobile(){
+    return window.matchMedia("(max-width: 760px)").matches;
+  }
+
+  function openSheet(){
+    if (!sheet || !backdrop) return;
+
+    sheet.classList.add("open");
+    backdrop.classList.add("open");
+    document.body.classList.add("mobileSheetOpen");
+
+    sheet.setAttribute("aria-hidden", "false");
+    backdrop.setAttribute("aria-hidden", "false");
+  }
+
+  function closeSheet(){
+    if (!sheet || !backdrop) return;
+
+    sheet.classList.remove("open");
+    backdrop.classList.remove("open");
+    document.body.classList.remove("mobileSheetOpen");
+
+    sheet.setAttribute("aria-hidden", "true");
+    backdrop.setAttribute("aria-hidden", "true");
+  }
+
+  function activeTabKey(){
+    const visible = Array.from(
+      document.querySelectorAll('.content > section[id^="tab-"]')
+    ).find(section => !section.hidden);
+
+    if (!visible) return "vouchers";
+
+    return String(visible.id || "").replace(/^tab-/, "");
+  }
+
+  function syncMobileNavigation(){
+    const key = activeTabKey();
+
+    if (pageTitle){
+      pageTitle.textContent = pageTitles[key] || "FU-BookKeeping";
+    }
+
+    const primary = primaryGroups[key] || "";
+
+    document
+      .querySelectorAll(".mobileNavButton[data-mobile-tab]")
+      .forEach(button => {
+        button.classList.toggle(
+          "active",
+          button.dataset.mobileTab === primary
+        );
+      });
+
+    if (openButton){
+      openButton.classList.toggle("active", !primary);
+    }
+  }
+
+  function syncCompanyName(){
+    if (!companyTitle) return;
+
+    const select = document.getElementById("companySelect");
+    const selectedText =
+      select &&
+      select.selectedOptions &&
+      select.selectedOptions[0]
+        ? select.selectedOptions[0].textContent
+        : "";
+
+    companyTitle.textContent =
+      String(selectedText || "").trim() || "FU-BookKeeping";
+  }
+
+  function syncStatus(){
+    if (!statusButton) return;
+
+    const storage = document.getElementById("storagePill");
+    const backup = document.getElementById("backupPill");
+
+    const storageText = String(storage?.textContent || "");
+    const backupText = String(backup?.textContent || "");
+
+    const bad =
+      /offline|blockerad|fel|ingen fil|inte ansluten|stöds ej/i.test(
+        storageText + " " + backupText
+      );
+
+    const ok =
+      !bad &&
+      /datafil|ansluten|sparad|backup/i.test(
+        storageText + " " + backupText
+      );
+
+    statusButton.classList.toggle("is-ok", ok);
+    statusButton.classList.toggle("is-bad", bad);
+  }
+
+  function activateMobileTab(key){
+    if (!key) return;
+
+    try {
+      if (typeof window.activateTab === "function"){
+        window.activateTab(key);
+      } else if (typeof activateTab === "function"){
+        activateTab(key);
+      } else {
+        const original =
+          document.querySelector(
+            `.sidebar button.tab[data-tab="${key}"]`
+          );
+
+        if (original) original.click();
+      }
+    } catch (error){
+      console.error("Mobile navigation failed", error);
+    }
+
+    closeSheet();
+
+    requestAnimationFrame(() => {
+      syncMobileNavigation();
+
+      if (isMobile()){
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth"
+        });
+      }
+    });
+  }
+
+  document.addEventListener("click", event => {
+    const tabButton =
+      event.target &&
+      event.target.closest
+        ? event.target.closest("[data-mobile-tab]")
+        : null;
+
+    if (tabButton){
+      event.preventDefault();
+      activateMobileTab(tabButton.dataset.mobileTab);
+      return;
+    }
+
+    const actionButton =
+      event.target &&
+      event.target.closest
+        ? event.target.closest("[data-mobile-action]")
+        : null;
+
+    if (!actionButton) return;
+
+    event.preventDefault();
+
+    const action = actionButton.dataset.mobileAction;
+
+    if (action === "bank-import"){
+      closeSheet();
+      document.getElementById("btnBankImportOpen")?.click();
+    }
+
+    if (action === "webshop"){
+      closeSheet();
+      document.getElementById("btnWsQuickImport")?.click();
+    }
+  });
+
+  openButton?.addEventListener("click", event => {
+    event.preventDefault();
+
+    if (sheet?.classList.contains("open")){
+      closeSheet();
+    } else {
+      openSheet();
+    }
+  });
+
+  closeButton?.addEventListener("click", closeSheet);
+  backdrop?.addEventListener("click", closeSheet);
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") closeSheet();
+  });
+
+  statusButton?.addEventListener("click", () => {
+    activateMobileTab("settings");
+
+    requestAnimationFrame(() => {
+      document
+        .getElementById("workfileCard")
+        ?.scrollIntoView({
+          block: "start",
+          behavior: "smooth"
+        });
+    });
+  });
+
+  const companySelect = document.getElementById("companySelect");
+
+  companySelect?.addEventListener("change", () => {
+    requestAnimationFrame(syncCompanyName);
+  });
+
+  /*
+    Wrap regular application tables in an internal horizontal scroller.
+    Print-only invoice and quotation tables are excluded.
+  */
+  function wrapApplicationTables(){
+    document.querySelectorAll(".content table").forEach(table => {
+      if (
+        table.closest(".mobileTableScroll") ||
+        table.classList.contains("linesTable") ||
+        table.classList.contains("invoice-lines") ||
+        table.classList.contains("quote-print-table")
+      ){
+        return;
+      }
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "mobileTableScroll";
+
+      table.parentNode.insertBefore(wrapper, table);
+      wrapper.appendChild(table);
+    });
+  }
+
+  const sectionObserver = new MutationObserver(mutations => {
+    if (
+      mutations.some(
+        mutation =>
+          mutation.type === "attributes" &&
+          mutation.attributeName === "hidden"
+      )
+    ){
+      syncMobileNavigation();
+    }
+  });
+
+  document
+    .querySelectorAll('.content > section[id^="tab-"]')
+    .forEach(section => {
+      sectionObserver.observe(section, {
+        attributes: true,
+        attributeFilter: ["hidden"]
+      });
+    });
+
+  const statusObserver = new MutationObserver(() => {
+    syncStatus();
+  });
+
+  ["storagePill", "backupPill"].forEach(id => {
+    const element = document.getElementById(id);
+
+    if (element){
+      statusObserver.observe(element, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+        attributes: true
+      });
+    }
+  });
+
+  wrapApplicationTables();
+  syncCompanyName();
+  syncMobileNavigation();
+  syncStatus();
+
+  window.addEventListener("resize", () => {
+    if (!isMobile()) closeSheet();
+  });
+})();
+</script>
+
 </body>
 </html>
