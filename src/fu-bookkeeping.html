@@ -2673,20 +2673,21 @@ Tack!</div>
             <span id="fsStatus" class="status bad">Inte ansluten</span>
           </div>
           <p class="muted small" style="margin-top:10px;">
-            Kräver File System Access API (Chrome/Edge) och <b>secure context</b> (HTTPS eller localhost). Varje företag använder en egen JSON-datafil.
+            På dator används Chrome/Edge File System Access API. I iPhone-appen väljs JSON-datafilen via Filer, inklusive Google Drive och iCloud Drive.
           </p>
         </div>
 
         <div class="card">
           <h2>Backup (JSON)</h2>
           <div class="row" style="gap:10px; flex-wrap:wrap;">
-            <button class="btn secondary" id="btnChooseBackupDir" title="Välj mapp för autobackup">Byt backup-mapp…</button>
+            <button class="btn secondary" id="btnChooseBackupDir" title="Välj fil eller mapp för autobackup">Välj backup…</button>
             <label class="pill" style="display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border:1px solid #2a2e37; border-radius:999px; user-select:none;">
               <input type="checkbox" id="chkAutoBackup" checked style="margin:0;" />
               Autobackup (max 1/dag)
             </label>
             <span id="backupDirStatus" class="muted small" style="margin-left:auto; min-width:240px; text-align:right;"></span>
             <button class="btn" id="btnExportJson">Ladda ner backup.json</button>
+            <button class="btn secondary" id="btnExportDatedBackup">Skapa daterad backupkopia…</button>
             <label class="btn secondary" style="display:inline-flex; align-items:center; gap:8px; cursor:pointer;">
               Importera JSON
               <input id="jsonImport" type="file" accept="application/json" hidden />
@@ -4566,16 +4567,106 @@ function backupFileNameForDay(day){
   } catch {}
   return `${d}_${name}_backup.json`;
 }
+function nativeBackupSupported(){
+  try {
+    const plugin =
+      window.Capacitor &&
+      window.Capacitor.Plugins &&
+      window.Capacitor.Plugins.WorkspaceFile;
+
+    return !!(
+      plugin &&
+      typeof plugin.chooseBackupFile === "function" &&
+      typeof plugin.getBackupFileInfo === "function" &&
+      typeof plugin.writeBackupFile === "function" &&
+      typeof plugin.exportDatedBackup === "function"
+    );
+  } catch {
+    return false;
+  }
+}
+
+function activeBackupCompanyId(){
+  try {
+    return String(
+      CompanyManager &&
+      CompanyManager.getActiveCompanyId &&
+      CompanyManager.getActiveCompanyId() || ""
+    ).trim();
+  } catch {
+    return "";
+  }
+}
+
+function createNativeBackupDirHandle(info){
+  return {
+    __nativeBackupFile: true,
+    kind: "file",
+    name: String(
+      info && info.name
+        ? info.name
+        : "FU-Bookkeeping_backup.json"
+    ),
+
+    async queryPermission(){
+      return "granted";
+    },
+
+    async requestPermission(){
+      return "granted";
+    }
+  };
+}
+
+async function restoreNativeBackupFolder(){
+  if (!nativeBackupSupported()) return false;
+
+  const companyId = activeBackupCompanyId();
+  if (!companyId) return false;
+
+  const plugin = window.Capacitor.Plugins.WorkspaceFile;
+  const info = await plugin.getBackupFileInfo({ companyId });
+
+  if (!info || info.selected !== true){
+    if (
+      backupDirHandle &&
+      backupDirHandle.__nativeBackupFile
+    ){
+      backupDirHandle = null;
+    }
+
+    return false;
+  }
+
+  backupDirHandle = createNativeBackupDirHandle(info);
+  return true;
+}
+
 function backupApiSupported(){
-  return !!(window.showDirectoryPicker && window.FileSystemFileHandle && window.FileSystemDirectoryHandle);
+  return nativeBackupSupported() ||
+    !!(
+      window.showDirectoryPicker &&
+      window.FileSystemFileHandle &&
+      window.FileSystemDirectoryHandle
+    );
 }
 async function backupEnsurePermission(request){
+  if (nativeBackupSupported()){
+    if (!backupDirHandle){
+      try { await restoreNativeBackupFolder(); } catch {}
+    }
+    return !!backupDirHandle;
+  }
+
   if (!backupDirHandle) return false;
+
   try {
     const mode = "readwrite";
     const q = await backupDirHandle.queryPermission({ mode });
+
     if (q === "granted") return true;
     if (!request) return false;
+
     const r = await backupDirHandle.requestPermission({ mode });
     return r === "granted";
   } catch {
@@ -4583,13 +4674,52 @@ async function backupEnsurePermission(request){
   }
 }
 async function backupWriteJsonToDir(day){
-  if (!backupDirHandle) throw new Error("Ingen backup-mapp vald");
+  if (!backupDirHandle && nativeBackupSupported()){
+    await restoreNativeBackupFolder();
+  }
+
+  if (!backupDirHandle){
+    throw new Error("Ingen backupfil eller backupmapp vald");
+  }
+
+  const json = JSON.stringify(state, null, 2) + "
+";
+
+  if (
+    nativeBackupSupported() &&
+    backupDirHandle.__nativeBackupFile
+  ){
+    const companyId = activeBackupCompanyId();
+
+    if (!companyId){
+      throw new Error("Inget aktivt företag");
+    }
+
+    const result =
+      await window.Capacitor.Plugins.WorkspaceFile
+        .writeBackupFile({
+          companyId,
+          json
+        });
+
+    if (!result || result.ok !== true){
+      throw new Error("Native autobackup misslyckades");
+    }
+
+    return result.name || backupDirHandle.name;
+  }
+
   const filename = backupFileNameForDay(day);
-  const fileHandle = await backupDirHandle.getFileHandle(filename, { create: true });
+
+  const fileHandle = await backupDirHandle.getFileHandle(
+    filename,
+    { create: true }
+  );
+
   const writable = await fileHandle.createWritable();
-  const json = JSON.stringify(state, null, 2) + "\n";
   await writable.write(json);
   await writable.close();
+
   return filename;
 }
 async function maybeDailyAutoBackup(trigger){
@@ -4597,6 +4727,9 @@ async function maybeDailyAutoBackup(trigger){
     if (!backupApiSupported()) return;
     if (!autoBackupEnabled()) return;
     if (!CompanyManager.hasActiveCompany()) return;
+    if (!backupDirHandle && nativeBackupSupported()){
+      try { await restoreNativeBackupFolder(); } catch {}
+    }
     if (!backupDirHandle) return;
 
     const today = todayISO();
@@ -4619,19 +4752,63 @@ async function maybeDailyAutoBackup(trigger){
 }
 async function chooseBackupFolder(){
   if (!backupApiSupported()){
-    showToast("Autobackup kräver Chrome/Edge + HTTPS (File System Access API).", 6500);
+    showToast("Backup stöds inte i denna miljö.", 6500);
     return;
   }
+
   if (!CompanyManager.hasActiveCompany()){
     showToast("Välj/koppla ett företag först.", 4500);
     return;
   }
-  try{
+
+  if (nativeBackupSupported()){
+    try {
+      const companyId = activeBackupCompanyId();
+
+      const info = await window.Capacitor.Plugins.WorkspaceFile
+        .chooseBackupFolder({ companyId });
+
+      if (!info || info.selected !== true) return;
+
+      backupDirHandle = createNativeBackupDirHandle(info);
+
+      updateBackupUI();
+
+      // Skriv dagens JSON-backup omedelbart.
+      const today = todayISO();
+      const filename = await backupWriteJsonToDir(today);
+
+      setLastBackupDay(today);
+      updateBackupUI();
+
+      showToast(
+        `Backup-mapp vald · skapade ${filename}. ` +
+        "Dokumentspegling stöds ännu inte i iOS-appen.",
+        6500
+      );
+      return;
+    } catch (e){
+      if (String(e && e.message || "").toLowerCase() === "cancelled") return;
+
+      console.error(e);
+      showToast(
+        e && e.message
+          ? e.message
+          : "Kunde inte välja backup-mapp.",
+        6500
+      );
+      return;
+    }
+  }
+
+  try {
     const h = await window.showDirectoryPicker({ mode: "readwrite" });
     if (!h) return;
+
     await CompanyManager.setActiveBackupDirHandle(h);
 
-    const ok = await backupEnsurePermission(true); // user click → allow prompt
+    const ok = await backupEnsurePermission(true);
+
     if (!ok){
       showToast("Behörighet nekad till backup-mappen.", 6000);
       updateBackupUI();
@@ -4639,16 +4816,29 @@ async function chooseBackupFolder(){
     }
 
     updateBackupUI();
-    // Create today's backup immediately (still max 1/day)
     await maybeDailyAutoBackup("choose-folder");
-    try { await syncLocalFilesToBackupDir("choose-folder", { requestPermission: false, backfill: true }); } catch (e) { console.warn("File mirror sync failed", e); }
-    showToast("Backup-mapp vald. Dokument och underlag speglas nu hit i mappsystem.", 3000);
+
+    try {
+      await syncDocumentsToBackupDir(
+        "choose-folder",
+        { requestPermission: false, backfill: true }
+      );
+    } catch (e){
+      console.warn("Document mirror sync failed", e);
+    }
+
+    showToast(
+      "Backup-mapp vald. Dokument speglas nu hit i mappsystem.",
+      3000
+    );
   } catch (e){
     if (e && e.name === "AbortError") return;
+
     console.error(e);
     showToast("Kunde inte välja backup-mapp.", 6000);
   }
 }
+
 function updateBackupUI(){
   try{
     const el = document.getElementById("backupDirStatus");
@@ -7955,8 +8145,81 @@ if (!d.features) d.features = { sruEnabled: false };
   // OBS: Om hela UI:t "dör" beror det nästan alltid på att scriptet inte kan parsas
   // (SyntaxError). Den här sektionen är avsiktligt skriven utan dubletter/konstiga block.
 
+  function nativeWorkspaceSupported(){
+    try {
+      return !!(
+        window.FU_MOBILE &&
+        typeof window.FU_MOBILE.isNative === "function" &&
+        window.FU_MOBILE.isNative() &&
+        typeof window.FU_MOBILE.openWorkspace === "function" &&
+        typeof window.FU_MOBILE.saveWorkspace === "function"
+      );
+    } catch {
+      return false;
+    }
+  }
+
+  function createNativeWorkspaceHandle(result){
+    let cachedJson = String(result && result.json ? result.json : "");
+    const fileName = String(result && result.name ? result.name : "bookkeeping.json");
+
+    return {
+      kind: "file",
+      name: fileName,
+      __nativeWorkspace: true,
+
+      async queryPermission(){
+        return "granted";
+      },
+
+      async requestPermission(){
+        return "granted";
+      },
+
+      async getFile(){
+        return {
+          name: fileName,
+          type: "application/json",
+          size: cachedJson.length,
+          async text(){
+            return cachedJson;
+          }
+        };
+      },
+
+      async createWritable(){
+        let pendingJson = "";
+
+        return {
+          async write(value){
+            if (typeof value === "string"){
+              pendingJson = value;
+            } else if (value instanceof Blob){
+              pendingJson = await value.text();
+            } else {
+              pendingJson = String(value == null ? "" : value);
+            }
+          },
+
+          async close(){
+            const saved = await window.FU_MOBILE.saveWorkspace(pendingJson);
+            if (!saved || saved.ok !== true){
+              throw new Error("Native sparning misslyckades.");
+            }
+            cachedJson = pendingJson;
+          },
+
+          async abort(){
+            pendingJson = "";
+          }
+        };
+      }
+    };
+  }
+
   function fsApiSupported(){
-    return !!(window.showOpenFilePicker && window.showSaveFilePicker && window.isSecureContext);
+    return nativeWorkspaceSupported() ||
+      !!(window.showOpenFilePicker && window.showSaveFilePicker && window.isSecureContext);
   }
 
   function getActiveCompanyHandles(){
@@ -8112,7 +8375,7 @@ if (!d.features) d.features = { sruEnabled: false };
     }
 
     if (!supported){
-      parts.push("För att skapa/koppla arbetsfil krävs Chrome/Edge och secure context (HTTPS eller localhost).\nDu är inte i ett läge där filåtkomst stöds just nu.");
+      parts.push("Filåtkomst stöds inte i den aktuella miljön.");
     }
 
     parts.push("Lösning: Gå till Administration → Inställningar → Företag (JSON-datafil) och klicka \"+ Skapa företag\" eller \"Koppla befintligt företag (JSON)\".");
@@ -8274,7 +8537,88 @@ if (!d.features) d.features = { sruEnabled: false };
   }
 
   async function fsConnectExisting(){
-    if (!fsApiSupported()) return showToast("Fil-synk kräver Chrome/Edge och secure context (HTTPS eller localhost).", 6500);
+    if (!fsApiSupported()) return showToast("Filåtkomst stöds inte i denna miljö.", 6500);
+
+    if (nativeWorkspaceSupported()){
+      try {
+        const result = await window.FU_MOBILE.openWorkspace();
+        if (!result || !String(result.json || "").trim()) return;
+
+        const txt = String(result.json);
+        const d = JSON.parse(txt);
+        const looksValid = !!(
+          d &&
+          typeof d === "object" &&
+          Array.isArray(d.fiscalYears) &&
+          d.accounts &&
+          typeof d.accounts === "object" &&
+          Array.isArray(d.vouchers)
+        );
+
+        if (!looksValid){
+          showToast("Filen ser inte ut som FU-Bookkeeping-data (fel format).", 6500);
+          return;
+        }
+
+        const preName = d && d.company && d.company.name
+          ? String(d.company.name).trim()
+          : "";
+
+        const preOrgnr = d && d.company && d.company.orgnr
+          ? String(d.company.orgnr).trim()
+          : "";
+
+        const name = await promptAsync("Företagsnamn", {
+          defaultValue: preName || "Företag",
+          placeholder: "Innovatio AB"
+        });
+        if (name == null) return;
+
+        const orgnr = await promptAsync("Org.nr (valfritt)", {
+          defaultValue: preOrgnr || "",
+          placeholder: "770314-3516"
+        });
+        if (orgnr == null) return;
+
+        const newId = await CompanyManager.upsertCompany({
+          id: companyNewId(),
+          name: String(name || "").trim() || "Företag",
+          orgnr: String(orgnr || "").trim(),
+          createdAtISO: nowISO(),
+          lastOpenedISO: nowISO(),
+          lastBackupDate: null,
+          colorTag: null
+        }, null);
+
+        await CompanyManager.setActiveCompany(newId);
+
+        try { await wipeLocalDataForNewDataFile(); } catch {}
+
+        fsHandle = createNativeWorkspaceHandle(result);
+        fsLastError = null;
+        fsLastSavedAt = null;
+
+        await fsLoadState();
+        fillYearSelectors();
+        try {
+          if (typeof renderAll === "function") renderAll();
+        } catch (e){
+          console.error(e);
+        }
+
+        updateFsUI();
+        showToast("Företag kopplat · laddade data från fil.", 3500);
+        return;
+      } catch (e){
+        if (String(e && e.message || "").toLowerCase() === "cancelled") return;
+        console.error(e);
+        fsLastError = e;
+        updateFsUI();
+        showToast(e && e.message ? e.message : "Kunde inte välja datafil.", 7000);
+        return;
+      }
+    }
+
     try {
       const picked = await window.showOpenFilePicker({
         multiple: false,
@@ -8340,8 +8684,57 @@ if (!d.features) d.features = { sruEnabled: false };
   }
 
   async function fsRelinkActiveCompanyDataFile(){
-    if (!fsApiSupported()) return showToast("Fil-synk kräver Chrome/Edge och secure context (HTTPS eller localhost).", 6500);
+    if (!fsApiSupported()) return showToast("Filåtkomst stöds inte i denna miljö.", 6500);
     if (!CompanyManager.hasActiveCompany()) return showToast("Välj ett företag först.", 4500);
+
+    if (nativeWorkspaceSupported()){
+      try {
+        const result = await window.FU_MOBILE.openWorkspace();
+        if (!result || !String(result.json || "").trim()) return;
+
+        const d = JSON.parse(String(result.json));
+        const looksValid = !!(
+          d &&
+          typeof d === "object" &&
+          Array.isArray(d.fiscalYears) &&
+          d.accounts &&
+          typeof d.accounts === "object" &&
+          Array.isArray(d.vouchers)
+        );
+
+        if (!looksValid){
+          showToast("Filen ser inte ut som FU-Bookkeeping-data (fel format).", 6500);
+          return;
+        }
+
+        try { await wipeLocalDataForNewDataFile(); } catch {}
+
+        fsHandle = createNativeWorkspaceHandle(result);
+        fsLastError = null;
+        fsLastSavedAt = null;
+
+        await fsLoadState();
+        fillYearSelectors();
+
+        try {
+          if (typeof renderAll === "function") renderAll();
+        } catch (e){
+          console.error(e);
+        }
+
+        updateFsUI();
+        showToast("Datafil omkopplad och laddad.", 4000);
+        return;
+      } catch (e){
+        if (String(e && e.message || "").toLowerCase() === "cancelled") return;
+        console.error(e);
+        fsLastError = e;
+        updateFsUI();
+        showToast(e && e.message ? e.message : "Kunde inte byta datafil.", 7000);
+        return;
+      }
+    }
+
     try {
       const picked = await window.showOpenFilePicker({
         multiple: false,
@@ -8459,6 +8852,9 @@ if (!d.features) d.features = { sruEnabled: false };
   }
 
   function scheduleFileMirrorSync(reason){
+    // Native iOS-versionen stöder tills vidare daglig JSON-backup,
+    // inte hela katalogträdet för dokument och bilagor.
+    if (nativeBackupSupported()) return;
     if (!backupApiSupported()) return;
     if (!backupDirHandle || !fsHandle) return;
 
@@ -22279,6 +22675,19 @@ if (btnSaveToFile) btnSaveToFile.addEventListener("click", async (e)=>{
 });
 if (btnDisconnectFile) btnDisconnectFile.addEventListener("click", async (e)=>{ e.preventDefault(); await fsDisconnect(); });
 
+const btnExportDatedBackup =
+  document.getElementById("btnExportDatedBackup");
+
+if (btnExportDatedBackup){
+  btnExportDatedBackup.addEventListener(
+    "click",
+    async (e)=>{
+      e.preventDefault();
+      await exportNativeDatedBackup();
+    }
+  );
+}
+
 if (fsAutosave) fsAutosave.addEventListener("change", ()=>{ state.fileSync = state.fileSync || { autosave:true, requireFile:false }; state.fileSync.autosave = !!fsAutosave.checked; save(); updateFsUI(); });
 if (fsRequireFile) fsRequireFile.addEventListener("change", ()=>{ state.fileSync = state.fileSync || { autosave:true, requireFile:false }; state.fileSync.requireFile = !!fsRequireFile.checked; save(); updateFsUI(); });
 
@@ -22292,6 +22701,12 @@ if (sOrgnr) sOrgnr.addEventListener("input", ()=>{ try { updateWsCredIdPreview()
   try {
     await CompanyManager.init();
     CompanyManager.updateCompanySelectUI();
+
+    if (nativeBackupSupported()){
+      try { await restoreNativeBackupFolder(); } catch (e) {
+        console.warn("Kunde inte återställa native backup-mapp", e);
+      }
+    }
   } catch (e){
     console.error(e);
   }

@@ -1,5 +1,6 @@
 import UIKit
 import Capacitor
+import WebKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -26,7 +27,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-        // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        #if DEBUG
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.enableWebViewInspection()
+        }
+        #endif
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
@@ -45,5 +50,40 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // tracking app url opens, make sure to keep this call
         return ApplicationDelegateProxy.shared.application(application, continue: userActivity, restorationHandler: restorationHandler)
     }
+
+
+    #if DEBUG
+    private func enableWebViewInspection() {
+        guard #available(iOS 16.4, *) else {
+            return
+        }
+
+        func findWebView(in view: UIView) -> WKWebView? {
+            if let webView = view as? WKWebView {
+                return webView
+            }
+
+            for subview in view.subviews {
+                if let webView = findWebView(in: subview) {
+                    return webView
+                }
+            }
+
+            return nil
+        }
+
+        guard
+            let rootView = window?.rootViewController?.view,
+            let webView = findWebView(in: rootView)
+        else {
+            print("[Debug] WKWebView not found")
+            return
+        }
+
+        webView.isInspectable = true
+        print("[Debug] WKWebView inspection enabled")
+    }
+    #endif
+
 
 }
