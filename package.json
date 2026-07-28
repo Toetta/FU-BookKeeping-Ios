@@ -9,7 +9,9 @@
     "cap:add:android": "npx cap add android",
     "cap:sync": "npx cap sync",
     "cap:open:ios": "npx cap open ios",
-    "cap:open:android": "npx cap open android"
+    "cap:open:android": "npx cap open android",
+    "verify:web": "node scripts/verify-web.js",
+    "build:verify": "npm run build && npm run verify:web"
   },
   "dependencies": {
     "@capacitor/android": "^6.0.0",
